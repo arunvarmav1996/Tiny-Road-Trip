@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Build.Content;
 using UnityEngine;
+using Random = UnityEngine.Random;
+using System;
 
 public class Spawner : MonoBehaviour
 {
@@ -10,35 +13,41 @@ public class Spawner : MonoBehaviour
     public GameObject obstaclePrefab;
     public Transform[] lanePositions;
     public float spawnInterval = 1.5f;
+        [Range(0, 1)] public float obstacleSpawnTimeFactor = 0.1f;
     public float obstacleSpeed = 5f;
+        [Range(0, 1)] public float obstacleSpeedFactor = 0.2f;
+    
+
 
     private float timer;
+    private float _obstacleSpawnTime;
+    private float _obstacleSpeed;
 
-    public float spawnSpeed = 5f;     // base speed
-    public float speedIncrease = 0.2f;
-    public float nextThreshold = 10f; // score at which speed increases next
-    
+    private float timeAlive;
+
+    private void Start()
+    {
+        
+        ResetFactors();
+            
+    }
+
     // Update is called once per frame
     void Update()
     {
         timer += Time.deltaTime;
+        timeAlive += Time.deltaTime;
 
-        if (timer>= spawnInterval)
+        if (timer>= _obstacleSpawnTime)
         {
             SpawnObstacle();
             timer = 0f;
 
         }
 
-        //float currentScore = ScoreManager.Instance.score;
+        CalculateFactors();
 
-    /*if (currentScore >= nextThreshold)
-    {
-        spawnSpeed += speedIncrease;
-        nextThreshold += 10f;     // set next goal
-        Debug.Log("Speed Increased! New Speed = " + spawnSpeed);
-    }*/
-
+      
     }
 
     void SpawnObstacle()
@@ -60,8 +69,22 @@ public class Spawner : MonoBehaviour
         rb=obs.AddComponent<Rigidbody2D>();
 
         rb.gravityScale = 0;
-        rb.velocity = new Vector2(0,-obstacleSpeed);
+        rb.velocity = new Vector2(0,-_obstacleSpeed);
 
         Destroy(obs,6f);
+    }
+
+    private void ResetFactors()
+    {
+        timeAlive = 1f;
+
+        _obstacleSpawnTime = spawnInterval;
+        _obstacleSpeed = obstacleSpeed;
+    }
+
+    private void CalculateFactors()
+    {
+        _obstacleSpawnTime = spawnInterval / Mathf.Pow(timeAlive, obstacleSpawnTimeFactor);
+        _obstacleSpeed = obstacleSpeed * Mathf.Pow(timeAlive, obstacleSpeedFactor);
     }
 }

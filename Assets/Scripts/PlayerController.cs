@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     public float laneDistance = 1.7f;   // Distance between lanes
     public float moveSpeed = 5f;       // Speed of lane transition
     public int numLanes = 3;            // Total lanes on the road (odd number preferred)
+    public float dashSpeed = 1.0f;
     
     private int currentLane;            // 0 = middle lane
     private Vector3 targetPosition;
@@ -57,7 +58,7 @@ public class PlayerController : MonoBehaviour
         //if (currentLane > 0)
         {
             //currentLane--;
-            targetPosition = new Vector3(targetPosition.x - laneDistance, transform.position.y, transform.position.z);
+            targetPosition = new Vector3((targetPosition.x - laneDistance), transform.position.y, transform.position.z);
             audioManager.Whoosh(audioManager.whoosh);
         }
     }
@@ -67,7 +68,7 @@ public class PlayerController : MonoBehaviour
         //if (currentLane < numLanes - 1)
         {
             //currentLane++;
-            targetPosition = new Vector3(targetPosition.x + laneDistance, transform.position.y, transform.position.z);
+            targetPosition = new Vector3((targetPosition.x + laneDistance), transform.position.y, transform.position.z);
             audioManager.Whoosh(audioManager.whoosh);
         }
     }

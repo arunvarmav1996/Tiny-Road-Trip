@@ -185,11 +185,10 @@ MonoBehaviour:
   - {fileID: 1524400971}
   - {fileID: 1769524343}
   - {fileID: 1556815187}
-  spawnInterval: 1
+  spawnInterval: 1.5
+  obstacleSpawnTimeFactor: 0.1
   obstacleSpeed: 2
-  spawnSpeed: 3
-  speedIncrease: 0.2
-  nextThreshold: 10
+  obstacleSpeedFactor: 0.2
 --- !u!1 &395117820
 GameObject:
   m_ObjectHideFlags: 0
@@ -295,6 +294,7 @@ MonoBehaviour:
   laneDistance: 0.85
   moveSpeed: 3
   numLanes: 5
+  dashSpeed: 2
 --- !u!50 &395117825
 Rigidbody2D:
   serializedVersion: 4
