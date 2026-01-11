@@ -28,6 +28,7 @@ public class AudioManager : MonoBehaviour
    {
        {
 
+        musicSource.loop = true; Debug.Log("Track is looped");
         musicSource.clip = background;
         musicSource.volume = 0f;
         musicSource.Play();
