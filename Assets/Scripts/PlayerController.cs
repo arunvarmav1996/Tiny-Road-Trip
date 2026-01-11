@@ -51,6 +51,36 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Right Button Pressed !");
             MoveRight();
         }
+        else if(Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            MoveForward();
+        }
+        else if(Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            MoveBackward();
+        }
+    }
+
+    public void MoveForward()
+    {
+        
+        {
+            //currentLane--;
+            targetPosition = new Vector3(targetPosition.x , transform.position.y + laneDistance, transform.position.z);
+            Debug.Log("Moving Forward");
+            //audioManager.Whoosh(audioManager.whoosh);
+        }
+    }
+
+    public void MoveBackward()
+    {
+        
+        {
+            
+            targetPosition = new Vector3(targetPosition.x, transform.position.y - laneDistance, transform.position.z);
+            Debug.Log("Moving Backward");
+            //audioManager.Whoosh(audioManager.whoosh);
+        }
     }
 
     public void MoveLeft()
@@ -78,14 +108,11 @@ public class PlayerController : MonoBehaviour
         transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
     }
     
-    /*void OnCollisionEnter2D(Collision2D collision)
-{
-    if(collision.gameObject.CompareTag("Obstacle"))
-    {
-        Debug.Log("Game Over !");
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
-}*/
+    void OnCollisionEnter2D(Collision2D collision)
+{    
+            Debug.Log(collision.gameObject.name);
+    
+}
 
 
 }

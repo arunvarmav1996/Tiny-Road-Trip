@@ -292,7 +292,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   laneDistance: 0.85
-  moveSpeed: 3
+  moveSpeed: 5
   numLanes: 5
   dashSpeed: 2
 --- !u!50 &395117825
@@ -1798,6 +1798,10 @@ PrefabInstance:
     - target: {fileID: 2630260948147102800, guid: 2b338f28bbedbf34d94a9dfe3e565847, type: 3}
       propertyPath: m_Name
       value: Obstacle
+      objectReference: {fileID: 0}
+    - target: {fileID: 2630260948147102800, guid: 2b338f28bbedbf34d94a9dfe3e565847, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2630260948147102800, guid: 2b338f28bbedbf34d94a9dfe3e565847, type: 3}
       propertyPath: m_TagString
