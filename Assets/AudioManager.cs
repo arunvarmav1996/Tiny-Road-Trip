@@ -27,9 +27,10 @@ public class AudioManager : MonoBehaviour
    public void Start()
    {
        {
+            musicSource.Play();
 
-        musicSource.loop = true; Debug.Log("Track is looped");
-        musicSource.clip = background;
+       // musicSource.loop = true; Debug.Log("Track is looped");
+        //musicSource.clip = background;
         musicSource.volume = 0f;
         musicSource.Play();
         StartCoroutine(Fade(true, musicSource, 2f, 1f));
@@ -46,15 +47,17 @@ public class AudioManager : MonoBehaviour
     }
 
     float time = 0f;
-    float startVol = musicSource.volume;
-    while (time<duration)
-    {
-      time += Time.deltaTime;
-      musicSource.volume = Mathf.Lerp(startVol, targetVolume, time/duration);
-      yield return null;
-       
-    }
-    yield break;
+    float startVol = 0f;
+        /*while (time<duration)
+        //{
+          //time += Time.deltaTime;
+                musicSource.volume = 0f;
+          yield return null;
+
+        }*/
+
+    musicSource.volume = 0.1f;
+        yield break;
    }
 
    public void PlaySFX(AudioClip clip)

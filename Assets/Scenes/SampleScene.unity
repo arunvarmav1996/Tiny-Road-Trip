@@ -1279,7 +1279,7 @@ MonoBehaviour:
   sounds:
   - name: PlayerCrash
     clip: {fileID: 8300000, guid: ca27cf83e7106d842a35a2e0d12803b3, type: 3}
-    volume: 0.88
+    volume: 0.27
     pitch: 0.1
 --- !u!4 &979501641
 Transform:
@@ -1801,7 +1801,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2630260948147102800, guid: 2b338f28bbedbf34d94a9dfe3e565847, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2630260948147102800, guid: 2b338f28bbedbf34d94a9dfe3e565847, type: 3}
       propertyPath: m_TagString
@@ -2286,11 +2286,11 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 1
+  m_audioClip: {fileID: 8300000, guid: 2c45dd764cd21de4aa28438d3bfa396a, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 0
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
