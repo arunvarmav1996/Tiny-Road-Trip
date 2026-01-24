@@ -14,6 +14,7 @@ public class AudioManager : MonoBehaviour
    public AudioClip background;
    public AudioClip carRev;
    public AudioClip whoosh;
+    public AudioClip crash;
 
  
   void Awake()
