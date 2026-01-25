@@ -14,7 +14,7 @@ public class MainMenu : MonoBehaviour
 
     public void Close()
     {
-
+        Time.timeScale = 1.0f;
         SceneManager.LoadSceneAsync(0);
     }
 }
