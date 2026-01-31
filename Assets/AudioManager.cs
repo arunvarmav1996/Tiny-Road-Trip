@@ -15,6 +15,7 @@ public class AudioManager : MonoBehaviour
    public AudioClip carRev;
    public AudioClip whoosh;
     public AudioClip crash;
+    public AudioClip Siren;
 
  
   void Awake()
@@ -69,6 +70,19 @@ public class AudioManager : MonoBehaviour
    public void Whoosh(AudioClip whoosh)
     {
         SFXSource.PlayOneShot(whoosh);
+    }
+
+    public void SirenSFX(AudioClip Siren)
+    {
+        SFXSource.PlayOneShot(Siren);
+        SFXSource.volume = 0.1f;
+        
+        
+    }
+
+    public void StopSiren(AudioClip Siren)
+    {
+        SFXSource.Stop();
     }
 
    public Sounds[] sounds;

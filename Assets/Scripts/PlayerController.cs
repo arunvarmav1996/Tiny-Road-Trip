@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
         targetPosition = transform.position;
 
         audioManager.PlaySFX(audioManager.carRev);
+        audioManager.SirenSFX(audioManager.Siren);
         
     }
 
@@ -113,6 +114,8 @@ public class PlayerController : MonoBehaviour
 {    
             Debug.Log(collision.gameObject.name);
         audioManager.PlaySFX(audioManager.crash);
+        audioManager.StopSiren(audioManager.Siren);
+        
         
 
 
