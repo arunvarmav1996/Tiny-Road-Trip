@@ -30,8 +30,7 @@ public class PlayerController : MonoBehaviour
         currentLane = numLanes / 2;
         targetPosition = transform.position;
 
-        audioManager.PlaySFX(audioManager.carRev);
-        audioManager.SirenSFX(audioManager.Siren);
+    
         
     }
 
@@ -91,7 +90,7 @@ public class PlayerController : MonoBehaviour
         {
             //currentLane--;
             targetPosition = new Vector3((targetPosition.x - laneDistance), transform.position.y, transform.position.z);
-            audioManager.Whoosh(audioManager.whoosh);
+            
         }
     }
 
@@ -101,7 +100,7 @@ public class PlayerController : MonoBehaviour
         {
             //currentLane++;
             targetPosition = new Vector3((targetPosition.x + laneDistance), transform.position.y, transform.position.z);
-            audioManager.Whoosh(audioManager.whoosh);
+           
         }
     }
 
@@ -111,13 +110,9 @@ public class PlayerController : MonoBehaviour
     }
     
     void OnCollisionEnter2D(Collision2D collision)
-{    
-            Debug.Log(collision.gameObject.name);
-        audioManager.PlaySFX(audioManager.crash);
-        audioManager.StopSiren(audioManager.Siren);
-        
-        
-
+    {
+        audioManager.Play("PlayerCrash");
+        Debug.Log(collision.gameObject.name);
 
     }
 

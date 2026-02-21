@@ -1,91 +1,98 @@
 using UnityEngine;
 using UnityEngine.Audio;
 using System.Collections;
+using UnityEngine.SceneManagement;
+using System;
 
 
 
 public class AudioManager : MonoBehaviour
 {
-    [Header("-----------Audio Source----------")]
-   [SerializeField] AudioSource musicSource;
-   [SerializeField] AudioSource SFXSource;
+    public static AudioManager instance;
 
- [Header("-----------Audio Clip----------")]
-   public AudioClip background;
-   public AudioClip carRev;
-   public AudioClip whoosh;
-    public AudioClip crash;
-    public AudioClip Siren;
+    public Sounds[] sounds;
 
- 
-  void Awake()
-  {
-      foreach (Sounds s in sounds)
-      {
-        gameObject.AddComponent<AudioSource>();
-      }
-  }
 
-   public void Start()
-   {
-       {
-            musicSource.Play();
-
-       // musicSource.loop = true; Debug.Log("Track is looped");
-        //musicSource.clip = background;
-        musicSource.volume = 0f;
-        musicSource.Play();
-        StartCoroutine(Fade(true, musicSource, 2f, 1f));
-        StartCoroutine(Fade(false, musicSource, 2f, 0f));
-       }
-   }
-
-    public IEnumerator Fade(bool fadeIn, AudioSource musicSource, float duration, float targetVolume)
-   {
-    if(!fadeIn)
+    void Awake()
     {
-      double lengthOfSource = (double)musicSource.clip.samples/musicSource.clip.frequency;
-      yield return new WaitForSecondsRealtime((float)(lengthOfSource-duration));
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+
+        foreach (Sounds s in sounds)
+        {
+
+            if (s.clip == null)
+            {
+                Debug.LogWarning($"AudioManager: Sound '{s.name}' has no Audioclip assigned!");
+                continue;
+            }
+
+            s.source = gameObject.AddComponent<AudioSource>();
+            s.source.clip = s.clip;
+            s.source.pitch = s.pitch;
+            s.source.volume = s.volume;
+            s.source.loop = s.loop;
+
+
+        }
+
     }
 
-    float time = 0f;
-    float startVol = 0f;
-        /*while (time<duration)
-        //{
-          //time += Time.deltaTime;
-                musicSource.volume = 0f;
-          yield return null;
-
-        }*/
-
-    musicSource.volume = 0.1f;
-        yield break;
-   }
-
-   public void PlaySFX(AudioClip clip)
-   {
-    SFXSource.PlayOneShot(clip);
-   }
-
-   public void Whoosh(AudioClip whoosh)
+    public void Start()
     {
-        SFXSource.PlayOneShot(whoosh);
+
+
     }
 
-    public void SirenSFX(AudioClip Siren)
+
+    public void Play(string name)
     {
-        SFXSource.PlayOneShot(Siren);
-        SFXSource.volume = 0.1f;
-        
-        
+        if (sounds == null) return;
+
+
+        Sounds s = Array.Find(sounds, sound => sound.name == name);
+
+        if (s == null)
+        {
+            Debug.LogWarning($"AudioManager: Sound '{name}' not found!");
+            return;
+        }
+
+
+        s.source.Play();
+
+
     }
 
-    public void StopSiren(AudioClip Siren)
+    public void Stop(string name)
     {
-        SFXSource.Stop();
-    }
+        if (sounds == null) return;
 
-   public Sounds[] sounds;
-   
-   
+        Sounds s = Array.Find(sounds, sound => sound.name == name);
+
+        if (s == null)
+        {
+            Debug.LogWarning($"AudioManager: Sound '{name}' not found!");
+            return;
+        }
+
+        s.source.Stop();
+
+    }
 }
+
+
+
+
+
+
+
