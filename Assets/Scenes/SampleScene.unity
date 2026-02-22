@@ -1488,32 +1488,38 @@ MonoBehaviour:
   sounds:
   - name: PlayerCrash
     clip: {fileID: 8300000, guid: ca27cf83e7106d842a35a2e0d12803b3, type: 3}
-    volume: 0.699
-    pitch: 1.67
+    volume: 1
+    pitch: 1
     loop: 0
     source: {fileID: 0}
   - name: BackgroundMusic
     clip: {fileID: 8300000, guid: 20b4b58e22c18884195c88fdf531e70d, type: 3}
-    volume: 0.732
+    volume: 1
     pitch: 1
     loop: 1
     source: {fileID: 0}
   - name: CarRev
     clip: {fileID: 8300000, guid: e29f3343e452dd94ca33cb6ffac7fb99, type: 3}
-    volume: 0.784
+    volume: 1
     pitch: 1
     loop: 1
     source: {fileID: 0}
   - name: Whoosh
     clip: {fileID: 8300000, guid: c759af51791414f489f89bc33f35b998, type: 3}
-    volume: 0.27
-    pitch: 0.1
+    volume: 1
+    pitch: 1
     loop: 0
     source: {fileID: 0}
   - name: Siren
     clip: {fileID: 8300000, guid: eb1f46d597fb10941ad06ea7c0f288cf, type: 3}
-    volume: 0.27
-    pitch: 0.1
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: GameOver
+    clip: {fileID: 8300000, guid: 4f1631fa1ab965147b1fb76689bbbee6, type: 3}
+    volume: 1
+    pitch: 1
     loop: 0
     source: {fileID: 0}
 --- !u!4 &979501641
@@ -1747,15 +1753,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: 0
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8ccae6ab031d49a4c9bbcff581958804, type: 2}
-  m_sharedMaterial: {fileID: -5254233059914057661, guid: 8ccae6ab031d49a4c9bbcff581958804, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 062003d1f7b35fc41850226b3b31bad3, type: 2}
+  m_sharedMaterial: {fileID: -6096946197147900595, guid: 062003d1f7b35fc41850226b3b31bad3, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4280265524
-  m_fontColor: {r: 0.20237319, g: 0.6698113, b: 0.12322002, a: 1}
+    rgba: 4281180867
+  m_fontColor: {r: 0.764151, g: 0.6348565, b: 0.17661981, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
