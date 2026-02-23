@@ -16,6 +16,9 @@ public class PlayerController : MonoBehaviour
     private Vector3 targetPosition;
     
     AudioManager audioManager;
+    private Vector2 maxMoveDir = new Vector2(2,2.1f);
+    private Vector2 minMoveDir = new Vector2(-2, -4.75f);
+
 
     private void Awake()
     {
@@ -37,8 +40,75 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        HandleTouchInput();
         HandleInput();
         MoveToTargetLane();
+    }
+
+    [SerializeField] private float minSwipeDistance = 60f; // pixels (tune)
+
+    private Vector2 startTouch;
+    private int activeFingerId = -1;
+    private bool swipeConsumed = false;
+    void HandleTouchInput()
+    {
+        if (Input.touchCount <= 0) return;
+
+        // Track only ONE finger consistently
+        Touch touch = Input.GetTouch(0);
+
+        // If we already locked onto a finger, ignore other fingers
+        if (activeFingerId != -1 && touch.fingerId != activeFingerId)
+            return;
+
+        if (touch.phase == TouchPhase.Began)
+        {
+            activeFingerId = touch.fingerId;
+            startTouch = touch.position;
+            swipeConsumed = false;
+            return;
+        }
+
+        // You can trigger on Ended OR on Moved once it crosses threshold (your choice)
+        if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+        {
+            if (swipeConsumed)
+            {
+                ResetTouch();
+                return;
+            }
+
+            Vector2 delta = touch.position - startTouch;
+
+            // Ignore tiny swipes/taps
+            if (delta.magnitude < minSwipeDistance)
+            {
+                ResetTouch();
+                return;
+            }
+
+            swipeConsumed = true;
+
+            // Decide direction WITHOUT normalize (more stable)
+            if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
+            {
+                if (delta.x < 0f) MoveLeft();
+                else MoveRight();
+            }
+            else
+            {
+                if (delta.y > 0f) MoveForward();
+                else MoveBackward();
+            }
+
+            ResetTouch();
+        }
+    }
+
+    private void ResetTouch()
+    {
+        activeFingerId = -1;
+        swipeConsumed = false;
     }
     void HandleInput()
     {
@@ -64,7 +134,7 @@ public class PlayerController : MonoBehaviour
 
     public void MoveForward()
     {
-        
+        if (transform.position.y < maxMoveDir.y)
         {
             //currentLane--;
             targetPosition = new Vector3(targetPosition.x , transform.position.y + laneDistance, transform.position.z);
@@ -75,7 +145,7 @@ public class PlayerController : MonoBehaviour
 
     public void MoveBackward()
     {
-        
+        if (transform.position.y > minMoveDir.y)
         {
             
             targetPosition = new Vector3(targetPosition.x, transform.position.y - laneDistance, transform.position.z);
@@ -86,7 +156,7 @@ public class PlayerController : MonoBehaviour
 
     public void MoveLeft()
     {
-        //if (currentLane > 0)
+        if (transform.position.x>minMoveDir.x)
         {
             //currentLane--;
             targetPosition = new Vector3((targetPosition.x - laneDistance), transform.position.y, transform.position.z);
@@ -96,7 +166,7 @@ public class PlayerController : MonoBehaviour
 
     public void MoveRight()
     {
-        //if (currentLane < numLanes - 1)
+        if (transform.position.x < maxMoveDir.x)
         {
             //currentLane++;
             targetPosition = new Vector3((targetPosition.x + laneDistance), transform.position.y, transform.position.z);
