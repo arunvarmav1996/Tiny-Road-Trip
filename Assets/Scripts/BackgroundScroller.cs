@@ -12,9 +12,17 @@ public class BackgroundScroller : MonoBehaviour
 
 
     // Start is called before the first frame update
+    public void Awake()
+    {
+        double roadWidth = -0.269954 * ((float)Screen.height /(float) Screen.width) + 0.93991f;
+        Debug.Log($"roadWidth {roadWidth} and screenRatio : {(float)Screen.height/(float)Screen.width}");
+        gameObject.transform.localScale = new Vector3((float)roadWidth,
+            gameObject.gameObject.transform.localScale.y,
+            gameObject.transform.localScale.z);
+    }
     void Start()
     {
-        collider = GetComponent<BoxCollider2D>();
+        //collider = GetComponent<BoxCollider2D>();
         rb = GetComponent<Rigidbody2D>();
         height = collider.size.y;
         collider.enabled =false;

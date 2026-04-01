@@ -74,6 +74,7 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
+        ObjectSpawner.spawnerInstance.DisableAllObjects();
         Time.timeScale = 1;
         SceneManager.LoadScene(1);
 

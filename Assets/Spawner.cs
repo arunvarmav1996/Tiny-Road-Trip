@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Build.Content;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using System;
@@ -25,6 +24,16 @@ public class Spawner : MonoBehaviour
 
     private float timeAlive;
 
+
+    private void Awake()
+    {
+        double loc = -0.790594 * ((float)Screen.height / Screen.width) + 2.52476f;
+        lanePositions[0].position = new Vector3((float)loc * 2,lanePositions[0].position.y, lanePositions[0].position.z);
+        lanePositions[1].position = new Vector3((float)loc, lanePositions[1].position.y, lanePositions[1].position.z);
+        lanePositions[3].position = new Vector3(-(float)loc, lanePositions[3].position.y, lanePositions[3].position.z);
+        lanePositions[4].position = new Vector3(-(float)loc * 2, lanePositions[4].position.y, lanePositions[4].position.z);
+
+    }
     private void Start()
     {
         
@@ -58,20 +67,16 @@ public class Spawner : MonoBehaviour
         int randomLane = Random.Range(0, lanePositions.Length);
         int randomSpriteIndex = Random.Range(0, obstacleSprites.Count);
 
-        GameObject obs = Instantiate(obstaclePrefab, lanePositions[randomLane].position, Quaternion.identity);
+        GameObject obs = ObjectSpawner.spawnerInstance.GetVehicle(lanePositions[randomLane].position);
 
-        SpriteRenderer sr = obs.GetComponent<SpriteRenderer>();
-        if(sr!=null)
-        sr.sprite = obstacleSprites[randomSpriteIndex];
-
-        Rigidbody2D rb = obs.GetComponent<Rigidbody2D>();
-        if(rb==null)
-        rb=obs.AddComponent<Rigidbody2D>();
-
+        //Rigidbody2D rb = obs.GetComponent<Rigidbody2D>();
+        if(obs.GetComponent<VehicleScript>() != null)
+            obs.GetComponent<VehicleScript>().SetVehicleStats(new Vector2(0, -_obstacleSpeed), obstacleSprites[randomSpriteIndex]);
+        /*
         rb.gravityScale = 0;
-        rb.velocity = new Vector2(0,-_obstacleSpeed);
+        rb.velocity = new Vector2(0,-_obstacleSpeed);*/
 
-        Destroy(obs,6f);
+        //Destroy(obs,6f);
     }
 
     private void ResetFactors()

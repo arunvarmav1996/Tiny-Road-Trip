@@ -15,14 +15,15 @@ public class PlayerController : MonoBehaviour
     private int currentLane;            // 0 = middle lane
     private Vector3 targetPosition;
     
-    AudioManager audioManager;
     private Vector2 maxMoveDir = new Vector2(2,2.1f);
     private Vector2 minMoveDir = new Vector2(-2, -4.75f);
 
 
     private void Awake()
     {
-        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+        double loc = -0.790594 * ((float)Screen.height / Screen.width) + 2.52476f;
+        laneDistance = (float)loc;
+        Debug.Log("Screen Width" + Screen.width + " Screen Height " + Screen.height + "Lane Dis " + laneDistance);
     }
     
     // Start is called before the first frame update
@@ -181,7 +182,7 @@ public class PlayerController : MonoBehaviour
     
     void OnCollisionEnter2D(Collision2D collision)
     {
-        audioManager.Play("PlayerCrash");
+        AudioManager.instance.Play("PlayerCrash");
         Debug.Log(collision.gameObject.name);
 
     }

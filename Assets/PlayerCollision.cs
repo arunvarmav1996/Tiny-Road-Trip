@@ -6,12 +6,12 @@ using UnityEngine;
 public class PlayerCollision : MonoBehaviour
 {
     
-    private GameManager gameManager;
+    [SerializeField]private GameManager gameManager;
 
-    private void Start()
+    /*private void Start()
     {
         gameManager = FindObjectOfType<GameManager>();
-    }
+    }*/
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
