@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TinyRoadTrip.Gameplay;
 using UnityEngine;
 
 public class BackgroundScroller : MonoBehaviour
@@ -10,6 +11,12 @@ public class BackgroundScroller : MonoBehaviour
     private float height;
     private float scrollspeed =-2f;
 
+    [Tooltip("Optional. Scales the scroll speed for Slow-Time / Nitro.")]
+    [SerializeField] private GameplaySpeedController speedController;
+
+    // World units per second the road moves down at normal speed (collectibles ride the road at this speed).
+    public float BaseScrollSpeed => -scrollspeed;
+
 
     // Start is called before the first frame update
     void Start()
@@ -19,7 +26,24 @@ public class BackgroundScroller : MonoBehaviour
         height = collider.size.y;
         collider.enabled =false;
 
-        rb.linearVelocity = new Vector2(0,scrollspeed);
+        float multiplier = 1f;
+        if (speedController != null)
+        {
+            multiplier = speedController.Multiplier;
+            speedController.MultiplierChanged += ApplySpeedMultiplier;
+        }
+        ApplySpeedMultiplier(multiplier);
+    }
+
+    void OnDestroy()
+    {
+        if (speedController != null)
+            speedController.MultiplierChanged -= ApplySpeedMultiplier;
+    }
+
+    private void ApplySpeedMultiplier(float multiplier)
+    {
+        rb.linearVelocity = new Vector2(0,scrollspeed * multiplier);
     }
 
     // Update is called once per frame

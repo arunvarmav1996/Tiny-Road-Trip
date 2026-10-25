@@ -53,12 +53,17 @@ public class GameManager : MonoBehaviour
 
     }
 
+    // Raised once when the run ends (coins save, combo resets).
+    public event System.Action GameOver;
+
     public void OnPlayerHitObstacle()
     {
         // Stops playing Audio
         Debug.Log("Game Over !");
 
         Time.timeScale = 0;
+
+        GameOver?.Invoke();
 
         AudioManager.instance.Stop("BackgroundMusic");
         AudioManager.instance.Stop("CarRev");
