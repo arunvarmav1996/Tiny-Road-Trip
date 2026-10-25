@@ -8,6 +8,13 @@ public class MainMenu : MonoBehaviour
    
     public void PlayGame()
     {
-        SceneManager.LoadSceneAsync(1);
+        SceneManager.LoadScene(1);
+
+    }
+
+    public void Close()
+    {
+        Time.timeScale = 1.0f;
+        SceneManager.LoadSceneAsync(0);
     }
 }

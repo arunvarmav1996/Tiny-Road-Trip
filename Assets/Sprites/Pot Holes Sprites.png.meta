@@ -1,0 +1,969 @@
+fileFormatVersion: 2
+guid: 5be17f613ded23d46abd3dbfc34796c8
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 233, y: 283, z: 6, w: 18}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: 0
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Pot Holes Sprites_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 234
+        height: 368
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e8c0338ea270d7f4581375bb1af99ef9
+      internalID: 1164760052
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pot Holes Sprites_1
+      rect:
+        serializedVersion: 2
+        x: 234
+        y: 276
+        width: 122
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d560ca8f65fb9134fbeb69309b644881
+      internalID: 1230023253
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pot Holes Sprites_2
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 318
+        width: 12
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 52eeba15c369b4d45b4d70121e2c53e9
+      internalID: 1441981693
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pot Holes Sprites_3
+      rect:
+        serializedVersion: 2
+        x: 270
+        y: 210
+        width: 90
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65fff4f4b9044104282b2b3b86880e19
+      internalID: 1104481231
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pot Holes Sprites_4
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 258
+        width: 12
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 052f23f21edc8d1418d2a0870179072d
+      internalID: 353363228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pot Holes Sprites_5
+      rect:
+        serializedVersion: 2
+        x: 18
+        y: 0
+        width: 226
+        height: 246
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bf39ec92f531eca49bc4fe15bb86014f
+      internalID: -608198210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pot Holes Sprites_6
+      rect:
+        serializedVersion: 2
+        x: 366
+        y: 234
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b8ba2cf1eddf4154499c567ed192acb4
+      internalID: 730814440
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pot Holes Sprites_7
+      rect:
+        serializedVersion: 2
+        x: 156
+        y: 120
+        width: 210
+        height: 108
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 53182aa8c58fd6241a2d94d91a191dee
+      internalID: -301296855
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pot Holes Sprites_8
+      rect:
+        serializedVersion: 2
+        x: 366
+        y: 222
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fc5bbe1c2ff16894792712bcdb69f9f9
+      internalID: -215233633
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pot Holes Sprites_9
+      rect:
+        serializedVersion: 2
+        x: 228
+        y: 30
+        width: 136
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 287b26b6a5dbf8a429331327aa761775
+      internalID: -1618063488
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pot Holes Sprites_10
+      rect:
+        serializedVersion: 2
+        x: 288
+        y: 114
+        width: 6
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d81c58dd94eb53442a141ff8e28ee422
+      internalID: 1875374580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pot Holes Sprites_11
+      rect:
+        serializedVersion: 2
+        x: 354
+        y: 102
+        width: 6
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b08b619c3e86974c90da63853d797c5
+      internalID: -437893125
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pot Holes Sprites_12
+      rect:
+        serializedVersion: 2
+        x: 366
+        y: 84
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: be3403c15de59554aa149368b6f900c3
+      internalID: -708236909
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pot Holes Sprites_13
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 66
+        width: 12
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 60b86ef0dc83a924d946c8159a982ca7
+      internalID: 1459317467
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pot Holes Sprites_14
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 54
+        width: 12
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4a5d884bc1e2d1a4ebf70a92f08b1ebb
+      internalID: 892948753
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pot Holes Sprites_15
+      rect:
+        serializedVersion: 2
+        x: 312
+        y: 6
+        width: 12
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ac14caef0d320d84e86f33ab471b5c3a
+      internalID: 1763746784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline:
+    - - {x: -186, y: -184}
+      - {x: -183, y: -184}
+      - {x: -183, y: 178}
+      - {x: -185, y: 180}
+      - {x: -186, y: 180}
+    - - {x: -62, y: -158}
+      - {x: -38, y: -184}
+      - {x: -28, y: -184}
+      - {x: -28, y: -166}
+      - {x: -21, y: -161}
+      - {x: -20, y: -184}
+      - {x: -10, y: -184}
+      - {x: -10, y: -161}
+      - {x: -13, y: -158}
+      - {x: -15, y: -158}
+      - {x: -8, y: -158}
+      - {x: 16, y: -183}
+      - {x: 34, y: -179}
+      - {x: 44, y: -131}
+      - {x: 44, y: -127}
+      - {x: 38, y: -121}
+      - {x: 37, y: -117}
+      - {x: 40, y: -121}
+      - {x: 44, y: -126}
+      - {x: 46, y: -129}
+      - {x: 45, y: -137}
+      - {x: 53, y: -158}
+      - {x: 61, y: -157}
+      - {x: 116, y: -161}
+      - {x: 186, y: -132}
+      - {x: 186, y: -64}
+      - {x: 182, y: -46}
+      - {x: 121, y: -63}
+      - {x: 111, y: -56}
+      - {x: 101, y: -55}
+      - {x: 100, y: -58}
+      - {x: 87, y: -76}
+      - {x: 86, y: -80}
+      - {x: 86, y: -77}
+      - {x: 85, y: -74}
+      - {x: 78, y: -74}
+      - {x: 76, y: -76}
+      - {x: 64, y: -94}
+      - {x: 66, y: -99}
+      - {x: 62, y: -94}
+      - {x: 60, y: -92}
+      - {x: 53, y: -91}
+      - {x: 47, y: -72}
+      - {x: 30, y: -54}
+      - {x: 9, y: -57}
+      - {x: 3, y: -39}
+      - {x: -7, y: -35}
+      - {x: -16, y: -47}
+      - {x: -24, y: -30}
+      - {x: -32, y: -30}
+      - {x: -72, y: -46}
+      - {x: -75, y: -48}
+      - {x: -78, y: -48}
+      - {x: -70, y: -40}
+      - {x: -53, y: -25}
+      - {x: -23, y: -19}
+      - {x: -16, y: -36}
+      - {x: 8, y: -32}
+      - {x: 8, y: -47}
+      - {x: 19, y: -49}
+      - {x: 72, y: -74}
+      - {x: 86, y: -51}
+      - {x: 118, y: -56}
+      - {x: 119, y: -61}
+      - {x: 131, y: -60}
+      - {x: 166, y: -41}
+      - {x: 186, y: -26}
+      - {x: 186, y: 1}
+      - {x: 153, y: 27}
+      - {x: 85, y: 43}
+      - {x: -8, y: 49}
+      - {x: -22, y: 31}
+      - {x: -37, y: 16}
+      - {x: -77, y: 38}
+      - {x: -76, y: 40}
+      - {x: -76, y: 41}
+      - {x: -78, y: 46}
+      - {x: -74, y: 38}
+      - {x: -72, y: 36}
+      - {x: -66, y: 36}
+      - {x: -63, y: 37}
+      - {x: -34, y: 25}
+      - {x: -17, y: 47}
+      - {x: 11, y: 55}
+      - {x: 33, y: 73}
+      - {x: 45, y: 69}
+      - {x: 69, y: 101}
+      - {x: 22, y: 173}
+      - {x: -23, y: 184}
+      - {x: -107, y: 184}
+      - {x: -125, y: 172}
+      - {x: -122, y: 164}
+      - {x: -120, y: 162}
+      - {x: -116, y: 162}
+      - {x: -115, y: 160}
+      - {x: -123, y: 162}
+      - {x: -142, y: 160}
+      - {x: -174, y: 137}
+      - {x: -176, y: 124}
+      - {x: -176, y: 110}
+      - {x: -174, y: 108}
+      - {x: -168, y: 108}
+      - {x: -166, y: 109}
+      - {x: -166, y: 108}
+      - {x: -176, y: 104}
+      - {x: -176, y: 75}
+      - {x: -135, y: 41}
+      - {x: -120, y: 48}
+      - {x: -118, y: 50}
+      - {x: -112, y: 57}
+      - {x: -101, y: 50}
+      - {x: -115, y: 53}
+      - {x: -123, y: 42}
+      - {x: -144, y: 35}
+      - {x: -176, y: 18}
+      - {x: -176, y: 4}
+      - {x: -165, y: -43}
+      - {x: -139, y: -43}
+      - {x: -125, y: -55}
+      - {x: -110, y: -54}
+      - {x: -125, y: -61}
+      - {x: -130, y: -51}
+      - {x: -140, y: -45}
+      - {x: -171, y: -81}
+      - {x: -175, y: -127}
+      - {x: -151, y: -184}
+      - {x: -64, y: -184}
+      - {x: -64, y: -160}
+      - {x: -66, y: -158}
+      - {x: -69, y: -158}
+    - - {x: -2, y: -178}
+      - {x: -2, y: -184}
+      - {x: 8, y: -184}
+      - {x: 8, y: -179}
+      - {x: 5, y: -176}
+      - {x: 0, y: -176}
+    - - {x: 124, y: -170}
+      - {x: 124, y: -180}
+      - {x: 140, y: -180}
+      - {x: 140, y: -170}
+    - - {x: -74, y: -157}
+      - {x: -73, y: -158}
+      - {x: -75, y: -157}
+    - - {x: -135, y: -145}
+      - {x: -135, y: -146}
+    - - {x: 160, y: -144}
+      - {x: 170, y: -144}
+      - {x: 170, y: -134}
+      - {x: 160, y: -134}
+    - - {x: 67, y: -139}
+      - {x: 69, y: -136}
+      - {x: 69, y: -120}
+      - {x: 74, y: -122}
+      - {x: 74, y: -125}
+      - {x: 77, y: -128}
+      - {x: 80, y: -130}
+      - {x: 83, y: -130}
+      - {x: 86, y: -127}
+      - {x: 89, y: -131}
+      - {x: 87, y: -136}
+      - {x: 87, y: -139}
+      - {x: 63, y: -139}
+    - - {x: 55, y: -114}
+      - {x: 54, y: -114}
+      - {x: 52, y: -115}
+      - {x: 48, y: -112}
+      - {x: 44, y: -112}
+      - {x: 44, y: -113}
+      - {x: 48, y: -113}
+      - {x: 49, y: -112}
+      - {x: 55, y: -112}
+      - {x: 58, y: -110}
+      - {x: 58, y: -119}
+      - {x: 59, y: -118}
+    - - {x: 178, y: -94}
+      - {x: 178, y: -100}
+      - {x: 180, y: -102}
+      - {x: 186, y: -102}
+      - {x: 186, y: -92}
+      - {x: 180, y: -92}
+    - - {x: 84, y: -50}
+      - {x: 82, y: -55}
+      - {x: 82, y: -66}
+      - {x: 91, y: -66}
+      - {x: 97, y: -59}
+      - {x: 98, y: -52}
+      - {x: 97, y: -50}
+    - - {x: 30, y: -44}
+      - {x: 28, y: -46}
+      - {x: 28, y: -52}
+      - {x: 30, y: -54}
+      - {x: 36, y: -54}
+      - {x: 38, y: -52}
+      - {x: 38, y: -46}
+      - {x: 36, y: -44}
+    - - {x: 151, y: -44}
+      - {x: 148, y: -47}
+      - {x: 148, y: -52}
+      - {x: 150, y: -54}
+      - {x: 156, y: -54}
+      - {x: 158, y: -52}
+      - {x: 158, y: -46}
+      - {x: 156, y: -44}
+    - - {x: -156, y: -38}
+      - {x: -158, y: -40}
+      - {x: -158, y: -46}
+      - {x: -156, y: -48}
+      - {x: -150, y: -48}
+      - {x: -148, y: -46}
+      - {x: -148, y: -40}
+      - {x: -150, y: -38}
+    - - {x: -162, y: -26}
+      - {x: -164, y: -28}
+      - {x: -164, y: -34}
+      - {x: -162, y: -36}
+      - {x: -156, y: -36}
+      - {x: -154, y: -34}
+      - {x: -154, y: -28}
+      - {x: -156, y: -26}
+    - - {x: -48, y: -20}
+      - {x: -50, y: -22}
+      - {x: -50, y: -28}
+      - {x: -48, y: -30}
+      - {x: -36, y: -30}
+      - {x: -34, y: -28}
+      - {x: -34, y: -22}
+      - {x: -36, y: -20}
+    - - {x: -26, y: -7}
+      - {x: -28, y: -8}
+      - {x: -27, y: -8}
+    - - {x: 164, y: 24}
+      - {x: 164, y: 34}
+      - {x: 148, y: 34}
+      - {x: 148, y: 24}
+    - - {x: 100, y: 94}
+      - {x: 82, y: 69}
+      - {x: 82, y: 47}
+      - {x: 92, y: 37}
+      - {x: 103, y: 34}
+      - {x: 104, y: 38}
+      - {x: 106, y: 36}
+      - {x: 114, y: 32}
+      - {x: 129, y: 24}
+      - {x: 186, y: 24}
+      - {x: 186, y: 83}
+      - {x: 169, y: 94}
+    - - {x: -32, y: 50}
+      - {x: -32, y: 32}
+      - {x: -30, y: 30}
+      - {x: -19, y: 30}
+      - {x: -16, y: 38}
+      - {x: -16, y: 52}
+      - {x: -30, y: 52}
+    - - {x: 178, y: 44}
+      - {x: 178, y: 38}
+      - {x: 180, y: 36}
+      - {x: 186, y: 36}
+      - {x: 186, y: 46}
+      - {x: 180, y: 46}
+    - - {x: 178, y: 56}
+      - {x: 178, y: 50}
+      - {x: 180, y: 48}
+      - {x: 185, y: 48}
+      - {x: 186, y: 49}
+      - {x: 186, y: 58}
+      - {x: 180, y: 58}
+    - - {x: -87, y: 53}
+      - {x: -86, y: 53}
+      - {x: -84, y: 51}
+      - {x: -83, y: 52}
+      - {x: -84, y: 53}
+    - - {x: -123, y: 62}
+      - {x: -124, y: 64}
+      - {x: -122, y: 63}
+      - {x: -123, y: 62}
+      - {x: -123, y: 59}
+    - - {x: -131, y: 70}
+      - {x: -131, y: 73}
+      - {x: -134, y: 76}
+      - {x: -135, y: 76}
+      - {x: -135, y: 75}
+      - {x: -133, y: 75}
+      - {x: -129, y: 72}
+      - {x: -129, y: 69}
+    - - {x: 15, y: 72}
+      - {x: 14, y: 73}
+    - - {x: -159, y: 85}
+      - {x: -158, y: 86}
+      - {x: -158, y: 85}
+      - {x: -159, y: 84}
+      - {x: -159, y: 83}
+    - - {x: 101, y: 96}
+      - {x: 106, y: 96}
+      - {x: 114, y: 98}
+      - {x: 119, y: 100}
+      - {x: 132, y: 98}
+      - {x: 138, y: 99}
+      - {x: 162, y: 109}
+      - {x: 168, y: 116}
+      - {x: 172, y: 125}
+      - {x: 172, y: 141}
+      - {x: 170, y: 149}
+      - {x: 122, y: 168}
+      - {x: 76, y: 168}
+      - {x: 60, y: 167}
+      - {x: 46, y: 144}
+      - {x: 46, y: 120}
+      - {x: 53, y: 112}
+      - {x: 71, y: 94}
+      - {x: 78, y: 92}
+      - {x: 84, y: 90}
+      - {x: 98, y: 90}
+      - {x: 98, y: 98}
+      - {x: 96, y: 100}
+    - - {x: 172, y: 140}
+      - {x: 172, y: 134}
+      - {x: 174, y: 132}
+      - {x: 186, y: 132}
+      - {x: 186, y: 142}
+      - {x: 174, y: 142}
+    - - {x: -164, y: 154}
+      - {x: -170, y: 149}
+      - {x: -170, y: 139}
+      - {x: -168, y: 138}
+      - {x: -159, y: 138}
+      - {x: -154, y: 143}
+      - {x: -154, y: 152}
+      - {x: -155, y: 154}
+    - - {x: 16, y: 156}
+      - {x: 26, y: 156}
+      - {x: 26, y: 172}
+      - {x: 16, y: 172}
+    - - {x: -140, y: 178}
+      - {x: -140, y: 162}
+      - {x: -130, y: 162}
+      - {x: -130, y: 178}
+    - - {x: -122, y: 184}
+      - {x: -122, y: 180}
+      - {x: -114, y: 174}
+      - {x: -108, y: 174}
+      - {x: -106, y: 176}
+      - {x: -106, y: 184}
+    - - {x: -12, y: 184}
+      - {x: -14, y: 182}
+      - {x: -14, y: 176}
+      - {x: -12, y: 174}
+      - {x: -6, y: 174}
+      - {x: -4, y: 176}
+      - {x: -4, y: 182}
+      - {x: -6, y: 184}
+    physicsShape:
+    - - {x: -76, y: -47}
+      - {x: -128, y: -62}
+      - {x: -167, y: -92}
+      - {x: -167, y: -142}
+      - {x: -110, y: -162}
+      - {x: 30, y: -162}
+      - {x: 58, y: -146}
+      - {x: 58, y: -58}
+      - {x: -4, y: -47}
+    - - {x: -125, y: -140}
+      - {x: -132, y: -140}
+      - {x: -133, y: -143}
+      - {x: -133, y: -149}
+      - {x: -128, y: -153}
+      - {x: -120, y: -153}
+      - {x: -116, y: -150}
+      - {x: -116, y: -147}
+      - {x: -117, y: -143}
+    - - {x: 108, y: -141}
+      - {x: 107, y: -144}
+      - {x: 107, y: -146}
+      - {x: 109, y: -148}
+      - {x: 113, y: -148}
+      - {x: 114, y: -146}
+      - {x: 114, y: -142}
+      - {x: 112, y: -141}
+    - - {x: 95, y: -66}
+      - {x: 70, y: -81}
+      - {x: 70, y: -133}
+      - {x: 73, y: -144}
+      - {x: 156, y: -144}
+      - {x: 172, y: -139}
+      - {x: 172, y: -73}
+      - {x: 159, y: -66}
+    - - {x: 42, y: -119}
+      - {x: 42, y: -123}
+      - {x: 44, y: -125}
+      - {x: 50, y: -125}
+      - {x: 54, y: -124}
+      - {x: 54, y: -119}
+      - {x: 51, y: -116}
+      - {x: 45, y: -116}
+    - - {x: 22, y: -59}
+      - {x: 20, y: -61}
+      - {x: 20, y: -64}
+      - {x: 21, y: -66}
+      - {x: 28, y: -66}
+      - {x: 30, y: -65}
+      - {x: 30, y: -63}
+      - {x: 28, y: -59}
+    - - {x: 124, y: 43}
+      - {x: -11, y: 43}
+      - {x: -31, y: 38}
+      - {x: -31, y: -12}
+      - {x: 1, y: -36}
+      - {x: 57, y: -60}
+      - {x: 113, y: -60}
+      - {x: 169, y: -41}
+      - {x: 177, y: -23}
+      - {x: 177, y: 10}
+    - - {x: -151, y: 41}
+      - {x: -164, y: 22}
+      - {x: -164, y: -24}
+      - {x: -158, y: -30}
+      - {x: -136, y: -41}
+      - {x: -73, y: -41}
+      - {x: -48, y: -27}
+      - {x: -48, y: 36}
+      - {x: -58, y: 41}
+    - - {x: -16, y: -18}
+      - {x: -16, y: -24}
+      - {x: -13, y: -27}
+      - {x: -7, y: -27}
+      - {x: -5, y: -23}
+      - {x: -5, y: -18}
+    - - {x: 92, y: 93}
+      - {x: 88, y: 82}
+      - {x: 88, y: 55}
+      - {x: 97, y: 38}
+      - {x: 156, y: 38}
+      - {x: 174, y: 52}
+      - {x: 174, y: 93}
+    - - {x: -128, y: 169}
+      - {x: -169, y: 132}
+      - {x: -169, y: 71}
+      - {x: -127, y: 54}
+      - {x: 34, y: 54}
+      - {x: 45, y: 79}
+      - {x: 45, y: 153}
+      - {x: -5, y: 169}
+    - - {x: -148, y: 75}
+      - {x: -151, y: 74}
+      - {x: -151, y: 63}
+      - {x: -134, y: 63}
+      - {x: -133, y: 67}
+      - {x: -133, y: 74}
+      - {x: -135, y: 75}
+    - - {x: 16, y: 75}
+      - {x: 17, y: 72}
+      - {x: 21, y: 72}
+      - {x: 23, y: 74}
+      - {x: 22, y: 77}
+      - {x: 18, y: 77}
+    - - {x: 27, y: 92}
+      - {x: 25, y: 88}
+      - {x: 25, y: 84}
+      - {x: 29, y: 80}
+      - {x: 35, y: 80}
+      - {x: 41, y: 85}
+      - {x: 41, y: 89}
+      - {x: 37, y: 92}
+    - - {x: 71, y: 110}
+      - {x: 66, y: 110}
+      - {x: 66, y: 102}
+      - {x: 69, y: 101}
+      - {x: 74, y: 101}
+      - {x: 78, y: 104}
+      - {x: 78, y: 105}
+      - {x: 77, y: 108}
+    - - {x: 69, y: 166}
+      - {x: 53, y: 162}
+      - {x: 50, y: 156}
+      - {x: 50, y: 118}
+      - {x: 79, y: 102}
+      - {x: 162, y: 102}
+      - {x: 171, y: 113}
+      - {x: 171, y: 152}
+      - {x: 141, y: 166}
+    - - {x: -111, y: 165}
+      - {x: -113, y: 164}
+      - {x: -113, y: 158}
+      - {x: -106, y: 158}
+      - {x: -103, y: 160}
+      - {x: -103, y: 162}
+      - {x: -105, y: 165}
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 1537655665
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      Pot Holes Sprites_0: 1164760052
+      Pot Holes Sprites_1: 1230023253
+      Pot Holes Sprites_10: 1875374580
+      Pot Holes Sprites_11: -437893125
+      Pot Holes Sprites_12: -708236909
+      Pot Holes Sprites_13: 1459317467
+      Pot Holes Sprites_14: 892948753
+      Pot Holes Sprites_15: 1763746784
+      Pot Holes Sprites_2: 1441981693
+      Pot Holes Sprites_3: 1104481231
+      Pot Holes Sprites_4: 353363228
+      Pot Holes Sprites_5: -608198210
+      Pot Holes Sprites_6: 730814440
+      Pot Holes Sprites_7: -301296855
+      Pot Holes Sprites_8: -215233633
+      Pot Holes Sprites_9: -1618063488
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
