@@ -637,7 +637,7 @@ MonoBehaviour:
   referenceWidth: 1080
   referenceHeight: 1920
   referenceOrthographicSize: 4.976419
-  safeHalfWidth: 2.65
+  safeHalfWidth: 2.75
 --- !u!1 &565693272
 GameObject:
   m_ObjectHideFlags: 0

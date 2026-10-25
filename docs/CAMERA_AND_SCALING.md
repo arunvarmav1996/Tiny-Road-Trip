@@ -57,11 +57,13 @@ Not causes: Sprite import settings, the Canvas/UI (already fixed), the Unity 6 s
 Correct the existing `ResponsiveCamera` into a **"contain a safe gameplay rectangle"** camera:
 
 ```
-size = max( R , safeHalfWidth / aspect )      // R = 4.976419, safeHalfWidth ≈ 2.65
+size = max( R , safeHalfWidth / aspect )      // R = 4.976419, safeHalfWidth = 2.75
 ```
 
 - **9:16:** size = 4.976, identical to the original. Gameplay and feel are unchanged.
-- **Tall phones:** width-fit to ±2.65 (all lanes and car edges ±2.57 stay visible; only ~0.16 of the white shoulder is trimmed). iPhone 12 mini → size 5.74, y −6.98 … 4.50, so the road covers the full height. 20:9 → 5.89, top 4.65, no navy. (21:9 → top 4.94, 0.07 gap; see note.)
+- **Tall phones:** width-fit to ±2.75 (all lanes, car edges at ±2.57, and most of the white edge lines at 2.65–2.81 stay visible). iPhone 12 mini → size 5.96, y −7.20 … 4.72. 1080×2400 → size 6.11, top 4.871 (road top 4.875), no gap. (21:9 → top 5.18, a 0.30 strip above the road for part of each scroll cycle, filled with the road-coloured background; see note.)
+- **Value chosen by rendered tests** (2026-10-25, Main Camera rendered at 1080×2340, 1080×2400, 1536×2048, 1080×1920, 1170×2532, 1080×2520 and 1668×2388, with the road at both scroll extremes). 2.65 cropped the white edge lines on tall phones. Anything above ~2.75 opens a gap at the top on 1080×2400.
+- The road sprite size is now **confirmed** in the Editor: 10.24 × 28.9 units (texture imported at 726×2048, effective PPU 70.87), rendering 5.62 × 15.53 world units.
 - **iPad / wide:** size stays 4.976, so the **vertical play area matches the reference exactly** and the player and obstacles stay fully visible. The extra width (0.92 per side) is filled by **side fill** (pick one):
   - **S1 (minimal):** set the camera Background colour to a roadside colour instead of navy. One property change.
   - **S2 (nicer):** add a wide roadside/grass sprite behind the road (child of `road (4)` so it scrolls with it). This is a scene addition, not a new script.

@@ -12,8 +12,10 @@ public class ResponsiveCamera : MonoBehaviour
     public float referenceOrthographicSize = 5f;
 
     [Header("Safe Gameplay Area")]
-    // Half-width (world units) that must always be visible: outermost lane + car half-width.
-    public float safeHalfWidth = 2.65f;
+    // Half-width (world units) that must always be visible: all lanes plus most of the
+    // road's white edge lines (road spans ±2.81). Larger values leave a gap above the
+    // road on 20:9 phones, because the road sprite only covers y <= 4.875 while scrolling.
+    public float safeHalfWidth = 2.75f;
 
     private Camera cam;
     private int lastScreenWidth;
