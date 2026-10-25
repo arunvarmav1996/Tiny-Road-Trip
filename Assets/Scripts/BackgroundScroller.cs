@@ -19,7 +19,7 @@ public class BackgroundScroller : MonoBehaviour
         height = collider.size.y;
         collider.enabled =false;
 
-        rb.velocity = new Vector2(0,scrollspeed);
+        rb.linearVelocity = new Vector2(0,scrollspeed);
     }
 
     // Update is called once per frame

@@ -69,7 +69,7 @@ public class Spawner : MonoBehaviour
         rb=obs.AddComponent<Rigidbody2D>();
 
         rb.gravityScale = 0;
-        rb.velocity = new Vector2(0,-_obstacleSpeed);
+        rb.linearVelocity = new Vector2(0,-_obstacleSpeed);
 
         Destroy(obs,6f);
     }
