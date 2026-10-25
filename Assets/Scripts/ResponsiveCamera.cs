@@ -11,7 +11,13 @@ public class ResponsiveCamera : MonoBehaviour
     [Header("Original Camera Size")]
     public float referenceOrthographicSize = 5f;
 
+    [Header("Safe Gameplay Area")]
+    // Half-width (world units) that must always be visible: outermost lane + car half-width.
+    public float safeHalfWidth = 2.65f;
+
     private Camera cam;
+    private int lastScreenWidth;
+    private int lastScreenHeight;
 
     void Awake()
     {
@@ -21,22 +27,26 @@ public class ResponsiveCamera : MonoBehaviour
 
     void Update()
     {
-        UpdateCamera();
+        if (Screen.width != lastScreenWidth || Screen.height != lastScreenHeight)
+            UpdateCamera();
     }
 
     void UpdateCamera()
     {
-        if (!cam.orthographic)
-            return;
+        lastScreenWidth = Screen.width;
+        lastScreenHeight = Screen.height;
 
-        float referenceAspect =
-            referenceWidth / referenceHeight;
+        if (!cam.orthographic || Screen.height == 0)
+            return;
 
         float currentAspect =
             (float)Screen.width / Screen.height;
 
-        cam.orthographicSize =
-            referenceOrthographicSize *
-            (referenceAspect / currentAspect);
+        // Never show less than the original view (keeps the vertical play area on
+        // wide screens like iPad), and widen only when the screen is too narrow
+        // to fit the lanes (tall phones).
+        cam.orthographicSize = Mathf.Max(
+            referenceOrthographicSize,
+            safeHalfWidth / currentAspect);
     }
 }

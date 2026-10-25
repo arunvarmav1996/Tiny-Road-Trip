@@ -554,7 +554,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.52, g: 0.47, b: 0.54, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -637,6 +637,7 @@ MonoBehaviour:
   referenceWidth: 1080
   referenceHeight: 1920
   referenceOrthographicSize: 4.976419
+  safeHalfWidth: 2.65
 --- !u!1 &565693272
 GameObject:
   m_ObjectHideFlags: 0
