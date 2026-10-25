@@ -95,7 +95,26 @@ Not modified: `PlayerController`, `ResponsiveCamera`, `AudioManager`, `MainMenu`
 
 Test note: the Editor was unfocused during testing, so Play mode was kept ticking with a temporary `EditorApplication.update` hook and `Application.runInBackground` for that Play session only. Nothing was saved to project settings.
 
-## 5. How to revert
+## 5. Merge of `Difficulty-Setup` (`6dbc1f9` "object pooling", Aquwin11)
+
+Backups made before merging: branch `backup/feature-collectibles-pre-merge`, plus `git stash list` entry "pre-merge backup: uncommitted work before merging Difficulty-Setup" (includes untracked files).
+
+| File | Resolution |
+|---|---|
+| `ProjectSettings/ProjectVersion.txt` | Kept **6000.3.17f1**. The teammate's commit was made in 2022.3.62f2. |
+| `Assets/Spawner.cs` | Merged by hand. Kept: the difficulty curve (unchanged), the obstacle registry, speed scaling and shield hooks. Added: obstacles come from the teammate's `ObjectSpawner` pool (falls back to `Instantiate` if no pool exists). Cars below y −12 are **returned to the pool** instead of destroyed. This fixes a leak in the teammate version, where `RoadEndCollision` is not placed in the scene, so cars were never deactivated except on restart. Reused cars get their record replaced and have player collisions re-enabled (the shield's invulnerability ignores collisions per car). `OnDestroy` hands every car back to the pool, so cars can't drive into the next scene (the pool is `DontDestroyOnLoad`). The teammate's aspect-ratio lane formula is kept behind `adaptLanesToAspect` (default **off**). |
+| `Assets/PlayerCollision.cs` | Kept ours. It already contains the teammate's change (serialized `gameManager`), plus the shield and combo hooks. |
+| `Assets/Scripts/BackgroundScroller.cs` | Teammate's road-width formula kept behind `adaptWidthToAspect` (default **off**). Restored a `GetComponent` fallback for `collider`: the teammate commented it out, which throws if the scene reference is missing. |
+| `Assets/Scripts/PlayerController.cs` | Teammate's changes taken: `AudioManager.instance` replaces the tag lookup, which also fixes a restart bug. Their `laneDistance` formula is kept behind `adaptLaneDistanceToAspect` (default **off**). |
+| `Assets/GameManager.cs` | Both changes kept (our `GameOver` event, their `DisableAllObjects()` on restart), plus a null guard for when no pool exists. |
+| `Assets/Scripts/VehicleScript.cs` | `rb.velocity` changed to `rb.linearVelocity` (Unity 6 API). |
+| `Assets/Prefabs/Obstacle.prefab` | Teammate version: `VehicleScript` added, body **Dynamic** (was Kinematic), gravity 0, rotation frozen. |
+| `Assets/Scenes/SampleScene.unity` | Not taken whole from either side. Our scene plus the teammate's exact YAML: the `ObjectPooling` (`ObjectSpawner`) and child `Vehicle` objects (same file IDs, no collisions), the scene-root entry, the road's `collider` and `rb` references, and the disabled `LeftBoundaryCollider`, `RightBoundaryCollider` and `Parent_Road` 3D collider. Their Player `minSwipeDistance` and PlayerCollision `gameManager` were already present. **Not taken:** GameOverUI `m_AdditionalShaderChannelsFlag` 25 to 0 (TextMesh Pro needs 25). |
+| New from teammate | `ObjectSpawner.cs`, `VehicleScript.cs`, `RoadEndCollision.cs` (not used in the scene yet) |
+
+**Why the aspect formulas are off:** `ResponsiveCamera` already adapts the view per device, and it was verified on 7 resolutions. Running both scales the game twice. The formulas also put the outer lanes at x = ±2.94 on iPad, off the 2.81-wide road.
+
+## 6. How to revert
 
 - **Everything:** `git switch docs/unity6-analysis`. This feature lives only on `feature/collectibles-powerups`.
 - **Just the scene wiring:** revert commit `7637203`.

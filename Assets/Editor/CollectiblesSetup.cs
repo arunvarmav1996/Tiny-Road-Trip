@@ -106,6 +106,7 @@ public static class CollectiblesSetup
         CollectibleSpawner collectibleSpawner = GetOrAdd<CollectibleSpawner>(poolGo);
 
         Set(obstacleSpawner, "speedController", speed);
+        Set(obstacleSpawner, "playerCollider", playerCollider);
         Set(road, "speedController", speed);
         Set(coinManager, "gameManager", gameManager);
         SetArray(powerUps, "effects", new Object[] { slowFx, shieldFx, nitroFx, magnetFx });
