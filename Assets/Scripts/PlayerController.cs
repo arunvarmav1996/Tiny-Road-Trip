@@ -110,12 +110,10 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            Debug.Log("Left Button Pressed !");
             MoveLeft();
         }
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            Debug.Log("Right Button Pressed !");
             MoveRight();
         }
         else if(Input.GetKeyDown(KeyCode.UpArrow))
@@ -134,7 +132,6 @@ public class PlayerController : MonoBehaviour
         {
             //currentLane--;
             targetPosition = new Vector3(targetPosition.x , transform.position.y + laneDistance, transform.position.z);
-            Debug.Log("Moving Forward");
             //audioManager.Whoosh(audioManager.whoosh);
         }
     }
@@ -145,7 +142,6 @@ public class PlayerController : MonoBehaviour
         {
             
             targetPosition = new Vector3(targetPosition.x, transform.position.y - laneDistance, transform.position.z);
-            Debug.Log("Moving Backward");
             //audioManager.Whoosh(audioManager.whoosh);
         }
     }
@@ -178,7 +174,6 @@ public class PlayerController : MonoBehaviour
     void OnCollisionEnter2D(Collision2D collision)
     {
         AudioManager.instance.Play("PlayerCrash");
-        Debug.Log(collision.gameObject.name);
 
     }
 
