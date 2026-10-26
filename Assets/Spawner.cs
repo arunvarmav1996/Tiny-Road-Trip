@@ -12,10 +12,10 @@ public class Spawner : MonoBehaviour
     public List<Sprite> obstacleSprites;
     public GameObject obstaclePrefab;
     public Transform[] lanePositions;
-    public float spawnInterval = 1.5f;
-        [Range(0, 1)] public float obstacleSpawnTimeFactor = 0.1f;
-    public float obstacleSpeed = 5f;
-        [Range(0, 1)] public float obstacleSpeedFactor = 0.2f;
+
+    [Header("Difficulty")]
+    [Tooltip("Car speed and spawn spacing over the run: fast early ramp that levels off, plus busy/calm traffic waves.")]
+    [SerializeField] private TinyRoadTrip.Gameplay.Core.DifficultyCurve difficulty = new TinyRoadTrip.Gameplay.Core.DifficultyCurve();
 
     [Header("Screen Adaptation")]
     [Tooltip("Aspect-ratio lane formula from the Difficulty-Setup branch. Off by default: ResponsiveCamera already " +
@@ -247,17 +247,18 @@ public class Spawner : MonoBehaviour
         }
     }
 
+    // True during a wave's calm phase (fewer cars).
+    public bool IsCalmPhase => difficulty.IsCalm(timeAlive);
+
     private void ResetFactors()
     {
-        timeAlive = 1f;
-
-        _obstacleSpawnTime = spawnInterval;
-        _obstacleSpeed = obstacleSpeed;
+        timeAlive = 0f;
+        CalculateFactors();
     }
 
     private void CalculateFactors()
     {
-        _obstacleSpawnTime = spawnInterval / Mathf.Pow(timeAlive, obstacleSpawnTimeFactor);
-        _obstacleSpeed = obstacleSpeed * Mathf.Pow(timeAlive, obstacleSpeedFactor);
+        _obstacleSpawnTime = difficulty.SpawnInterval(timeAlive);
+        _obstacleSpeed = difficulty.Speed(timeAlive);
     }
 }

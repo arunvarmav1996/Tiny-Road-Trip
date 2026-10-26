@@ -324,4 +324,52 @@ namespace TinyRoadTrip.Gameplay.Tests
             Assert.AreEqual(-1, GameplayMath.PickWeighted(new[] { 0f, 0f }, 2, 0.5f));
         }
     }
+
+    public class DifficultyCurveTests
+    {
+        [Test]
+        public void Level_RisesFastEarlyThenLevelsOff()
+        {
+            var c = new DifficultyCurve { RampTime = 45f };
+            Assert.AreEqual(0f, c.Level(0f), 1e-5f);
+            float early = c.Level(30f) - c.Level(0f);
+            float late = c.Level(150f) - c.Level(120f);
+            Assert.Greater(early, late * 5f, "first 30 s must ramp much more than a late 30 s");
+            Assert.Less(c.Level(600f), 1.0001f);
+        }
+
+        [Test]
+        public void Speed_GoesFromStartTowardsMaxAndIgnoresWaves()
+        {
+            var c = new DifficultyCurve { StartSpeed = 2.5f, MaxSpeed = 5.5f, WarmUp = 0f, BusyDuration = 10f, CalmDuration = 5f };
+            Assert.AreEqual(2.5f, c.Speed(0f), 1e-4f);
+            Assert.Greater(c.Speed(300f), 5.4f);
+            Assert.LessOrEqual(c.Speed(300f), 5.5f);
+            Assert.IsTrue(c.IsCalm(12f));
+            Assert.Greater(c.Speed(12f), c.Speed(9f), "speed keeps rising through a calm phase");
+        }
+
+        [Test]
+        public void Waves_CalmAfterBusyAndRepeat()
+        {
+            var c = new DifficultyCurve { WarmUp = 12f, BusyDuration = 20f, CalmDuration = 6f };
+            Assert.IsFalse(c.IsCalm(5f), "no calm during warm-up");
+            Assert.IsFalse(c.IsCalm(20f));
+            Assert.IsTrue(c.IsCalm(33f));
+            Assert.IsFalse(c.IsCalm(39f), "next busy phase");
+            Assert.IsTrue(c.IsCalm(33f + 26f), "cycle repeats");
+        }
+
+        [Test]
+        public void SpawnInterval_TightensInBusyAndLoosensInCalm()
+        {
+            var c = new DifficultyCurve { RampTime = 1e6f, WarmUp = 0f, BusyDuration = 20f, CalmDuration = 6f,
+                                          BusyPeakIntervalMultiplier = 0.8f, CalmIntervalMultiplier = 2f };
+            float startOfBusy = c.SpawnInterval(0.01f);
+            float endOfBusy = c.SpawnInterval(19.9f);
+            float calm = c.SpawnInterval(22f);
+            Assert.Less(endOfBusy, startOfBusy, "busy phase builds tension");
+            Assert.Greater(calm, startOfBusy * 1.9f, "calm phase sends fewer cars");
+        }
+    }
 }
