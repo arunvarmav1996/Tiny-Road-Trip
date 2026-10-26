@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TinyRoadTrip.Gameplay.Core;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
@@ -54,9 +55,11 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private float minSwipeDistance = 60f; // pixels (tune)
 
-    private Vector2 startTouch;
     private int activeFingerId = -1;
-    private bool swipeConsumed = false;
+    private SwipeDetector swipe;
+
+    // The lane change fires as soon as the drag passes minSwipeDistance (no need to lift the finger);
+    // a quick flick that ends before any move frame is still caught on release. One move per touch.
     void HandleTouchInput()
     {
         if (Input.touchCount <= 0) return;
@@ -68,62 +71,40 @@ public class PlayerController : MonoBehaviour
         if (activeFingerId != -1 && touch.fingerId != activeFingerId)
             return;
 
-        if (touch.phase == TouchPhase.Began)
+        SwipeDirection direction = SwipeDirection.None;
+        switch (touch.phase)
         {
-            activeFingerId = touch.fingerId;
-            startTouch = touch.position;
-            swipeConsumed = false;
-            return;
+            case TouchPhase.Began:
+                activeFingerId = touch.fingerId;
+                swipe.Begin(touch.position.x, touch.position.y);
+                return;
+            case TouchPhase.Moved:
+            case TouchPhase.Stationary:
+                direction = swipe.Move(touch.position.x, touch.position.y);
+                break;
+            case TouchPhase.Ended:
+            case TouchPhase.Canceled:
+                direction = swipe.End(touch.position.x, touch.position.y);
+                activeFingerId = -1;
+                break;
         }
 
-        // You can trigger on Ended OR on Moved once it crosses threshold (your choice)
-        if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+        switch (direction)
         {
-            if (swipeConsumed)
-            {
-                ResetTouch();
-                return;
-            }
-
-            Vector2 delta = touch.position - startTouch;
-
-            // Ignore tiny swipes/taps
-            if (delta.magnitude < minSwipeDistance)
-            {
-                ResetTouch();
-                return;
-            }
-
-            swipeConsumed = true;
-
-            // Decide direction WITHOUT normalize (more stable)
-            if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
-            {
-                if (delta.x < 0f) MoveLeft();
-                else MoveRight();
-            }
-            else
-            {
-                if (delta.y > 0f) MoveForward();
-                else MoveBackward();
-            }
-
-            ResetTouch();
+            case SwipeDirection.Left: MoveLeft(); break;
+            case SwipeDirection.Right: MoveRight(); break;
+            case SwipeDirection.Up: MoveForward(); break;
+            case SwipeDirection.Down: MoveBackward(); break;
         }
-    }
-
-    private void ResetTouch()
-    {
-        activeFingerId = -1;
-        swipeConsumed = false;
     }
 
     // Re-enabled after a pause: the touch that pressed Resume ends while this component is active,
-    // so mark any in-progress touch as already used instead of reading it as a swipe.
+    // so ignore any in-progress touch instead of reading it as a swipe.
     private void OnEnable()
     {
+        if (swipe == null) swipe = new SwipeDetector(minSwipeDistance);
         activeFingerId = -1;
-        swipeConsumed = true;
+        swipe.Cancel();
     }
     void HandleInput()
     {
