@@ -167,9 +167,9 @@ namespace TinyRoadTrip.Gameplay
         private void OnNearMiss(NearMissResult result)
         {
             if (result.Combo <= 1)
-                ShowPopup($"NEAR MISS! +{result.Points}", nearMissColor);
+                ShowPopup($"NEAR MISS! +{result.Points} m", nearMissColor);
             else
-                ShowPopup($"{result.Multiplier}x COMBO! +{result.Points}", comboColor);
+                ShowPopup($"{result.Multiplier}x COMBO! +{result.Points} m", comboColor);
         }
 
         private void OnShieldAbsorbed()

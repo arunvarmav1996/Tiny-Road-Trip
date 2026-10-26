@@ -184,6 +184,65 @@ namespace TinyRoadTrip.Gameplay.Tests
         }
     }
 
+    public class RunDistanceTests
+    {
+        [Test]
+        public void TravelScalesWithSpeedMultiplier_AndBonusAdds()
+        {
+            var run = new RunDistance();
+            run.AddTravel(1f, 100f / 3f, 1f);      // 1 km per 30 s
+            Assert.AreEqual(33.333, run.TravelMeters, 1e-3);
+            run.AddTravel(1f, 100f / 3f, 0.5f);    // Slow-Time
+            Assert.AreEqual(50.0, run.TravelMeters, 1e-3);
+            run.AddBonus(25);
+            Assert.AreEqual(75.0, run.TotalMeters, 1e-3);
+        }
+
+        [Test]
+        public void ThirtySecondsAtNormalSpeed_IsOneKilometre()
+        {
+            var run = new RunDistance();
+            for (int i = 0; i < 1800; i++) run.AddTravel(1f / 60f, 100f / 3f, 1f);
+            Assert.AreEqual(1000.0, run.TravelMeters, 0.01);
+        }
+
+        [Test]
+        public void IgnoresInvalidInput()
+        {
+            var run = new RunDistance();
+            run.AddTravel(-1f, 33f, 1f);
+            run.AddTravel(1f, 33f, 0f);
+            run.AddBonus(-10);
+            Assert.AreEqual(0.0, run.TotalMeters);
+        }
+
+        [Test]
+        public void Kilometres_FloorToTwoDecimals()
+        {
+            Assert.AreEqual("0.00", DistanceFormat.Kilometers(0));
+            Assert.AreEqual("0.00", DistanceFormat.Kilometers(9.99));
+            Assert.AreEqual("1.23", DistanceFormat.Kilometers(1239.9));
+            Assert.AreEqual("12.50", DistanceFormat.Kilometers(12500));
+            Assert.AreEqual(123, DistanceFormat.DisplayStep(1239.9));
+        }
+
+        [Test]
+        public void BestScore_OnlyBeatenByLongerRun()
+        {
+            Assert.IsTrue(BestScore.Submit(500, 0).IsNewBest);
+            BestResult same = BestScore.Submit(500, 500);
+            Assert.IsFalse(same.IsNewBest);
+            Assert.AreEqual(500, same.Best);
+            BestResult worse = BestScore.Submit(300, 500);
+            Assert.IsFalse(worse.IsNewBest);
+            Assert.AreEqual(500, worse.Best);
+            BestResult better = BestScore.Submit(800, 500);
+            Assert.IsTrue(better.IsNewBest);
+            Assert.AreEqual(800, better.Best);
+            Assert.IsFalse(BestScore.Submit(0, 0).IsNewBest, "standing still is never a best");
+        }
+    }
+
     public class GameplayMathTests
     {
         [Test]
