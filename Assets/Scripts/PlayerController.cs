@@ -117,6 +117,14 @@ public class PlayerController : MonoBehaviour
         activeFingerId = -1;
         swipeConsumed = false;
     }
+
+    // Re-enabled after a pause: the touch that pressed Resume ends while this component is active,
+    // so mark any in-progress touch as already used instead of reading it as a swipe.
+    private void OnEnable()
+    {
+        activeFingerId = -1;
+        swipeConsumed = true;
+    }
     void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.LeftArrow))
