@@ -243,6 +243,56 @@ namespace TinyRoadTrip.Gameplay.Tests
         }
     }
 
+    public class SwipeDetectorTests
+    {
+        [Test]
+        public void FiresWhileDragging_OnceThresholdIsPassed()
+        {
+            var swipe = new SwipeDetector(60f);
+            swipe.Begin(100f, 100f);
+            Assert.AreEqual(SwipeDirection.None, swipe.Move(130f, 100f), "below threshold");
+            Assert.AreEqual(SwipeDirection.Right, swipe.Move(165f, 100f), "fires mid-drag, no release needed");
+            Assert.AreEqual(SwipeDirection.None, swipe.Move(400f, 100f), "only one move per touch");
+            Assert.AreEqual(SwipeDirection.None, swipe.End(400f, 100f), "release after firing does nothing");
+        }
+
+        [Test]
+        public void QuickFlick_IsCaughtOnRelease()
+        {
+            var swipe = new SwipeDetector(60f);
+            swipe.Begin(0f, 0f);
+            Assert.AreEqual(SwipeDirection.Down, swipe.End(5f, -90f));
+        }
+
+        [Test]
+        public void Tap_DoesNothing()
+        {
+            var swipe = new SwipeDetector(60f);
+            swipe.Begin(0f, 0f);
+            Assert.AreEqual(SwipeDirection.None, swipe.Move(10f, 5f));
+            Assert.AreEqual(SwipeDirection.None, swipe.End(12f, 6f));
+        }
+
+        [Test]
+        public void DominantAxis_PicksDirection()
+        {
+            var swipe = new SwipeDetector(60f);
+            swipe.Begin(0f, 0f); Assert.AreEqual(SwipeDirection.Left, swipe.End(-80f, 30f));
+            swipe.Begin(0f, 0f); Assert.AreEqual(SwipeDirection.Up, swipe.End(20f, 70f));
+        }
+
+        [Test]
+        public void Cancel_IgnoresRestOfTouch_UntilNextBegin()
+        {
+            var swipe = new SwipeDetector(60f);
+            swipe.Cancel();
+            Assert.AreEqual(SwipeDirection.None, swipe.Move(500f, 0f));
+            Assert.AreEqual(SwipeDirection.None, swipe.End(500f, 0f), "the tap that pressed Resume is not a swipe");
+            swipe.Begin(0f, 0f);
+            Assert.AreEqual(SwipeDirection.Left, swipe.Move(-70f, 0f));
+        }
+    }
+
     public class GameplayMathTests
     {
         [Test]

@@ -17,6 +17,9 @@ namespace TinyRoadTrip.Gameplay
                  "Cars settled in adjacent lanes are 0.36–0.48 apart, so the default only rewards last-moment dodges.")]
         [SerializeField, Min(0f)] private float nearMissDistance = 0.3f;
 
+        // World position between the player and the passing car (for effects).
+        public event System.Action<Vector3> NearMissAt;
+
         private void Update()
         {
             if (obstacleSpawner == null || playerCollider == null || comboManager == null) return;
@@ -39,7 +42,11 @@ namespace TinyRoadTrip.Gameplay
                     {
                         float gap = GameplayMath.HorizontalGap(player.min.x, player.max.x, b.min.x, b.max.x);
                         if (GameplayMath.IsNearMiss(gap, nearMissDistance))
+                        {
                             comboManager.RegisterNearMiss();
+                            float edgeX = b.center.x > player.center.x ? player.max.x : player.min.x;
+                            NearMissAt?.Invoke(new Vector3(edgeX, lineY, player.center.z - 0.05f));
+                        }
                     }
                 }
                 o.PreviousY = y;

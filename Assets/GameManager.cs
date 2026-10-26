@@ -47,8 +47,6 @@ public class GameManager : MonoBehaviour
             AudioManager.instance.Stop("CarRev");
             AudioManager.instance.Stop("BackgroundMusic");
 
-            Debug.Log("Collsion Working !!!!!!!!!!!!");
-
         }
 
     }
@@ -59,8 +57,6 @@ public class GameManager : MonoBehaviour
     public void OnPlayerHitObstacle()
     {
         // Stops playing Audio
-        Debug.Log("Game Over !");
-
         Time.timeScale = 0;
 
         GameOver?.Invoke();

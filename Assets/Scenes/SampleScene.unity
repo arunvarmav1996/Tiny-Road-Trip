@@ -8577,6 +8577,7 @@ GameObject:
   - component: {fileID: 1917952533}
   - component: {fileID: 1917952534}
   - component: {fileID: 1917952535}
+  - component: {fileID: 1917952536}
   m_Layer: 0
   m_Name: GameplaySystems
   m_TagString: Untagged
@@ -8785,6 +8786,33 @@ MonoBehaviour:
   pauseOnFocusLoss: 1
   pauseOnFocusLossInEditor: 0
   backButtonToggles: 1
+--- !u!114 &1917952536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1917952523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cadd89af827bbc24b9bd89ab2a3bcf74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TinyRoadTrip.Gameplay.GameFeel
+  gameManager: {fileID: 946399565}
+  nearMissDetector: {fileID: 1917952533}
+  powerUpManager: {fileID: 1917952527}
+  targetCamera: {fileID: 519420031}
+  crashShakeAmount: 0.28
+  crashShakeDuration: 0.35
+  crashFlashAlpha: 0.6
+  flashFadeDuration: 0.35
+  shieldShakeAmount: 0.15
+  shieldShakeDuration: 0.2
+  shieldFlashAlpha: 0.3
+  nearMissShakeAmount: 0.06
+  nearMissShakeDuration: 0.12
+  sparkCount: 14
+  sparkColor: {r: 1, g: 0.85, b: 0.3, a: 1}
 --- !u!1 &1934025364
 GameObject:
   m_ObjectHideFlags: 0
