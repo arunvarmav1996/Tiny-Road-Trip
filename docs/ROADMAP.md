@@ -17,7 +17,7 @@ Status of the features, mechanics and release tasks agreed so far. `[x]` done on
 - [~] First-run swipe hint, shown once (`feature/polish-2`)
 - [ ] Optional: tap left/right half of the screen to steer
 - [~] Difficulty curve with busy/calm waves (`feature/difficulty-waves`)
-- [ ] Traffic patterns: pairs, wall with one gap, zigzag, slow clusters; fairness rule (never all lanes blocked)
+- [~] Traffic patterns: pairs, wall with gaps, zigzag + fairness rule (`feature/traffic-patterns`); slow clusters not done
 - [ ] Car speed variety; lane-changers with turn-signal blink
 - [ ] Two-lane trucks (needs a wide sprite), parked cars
 - [ ] Road hazards: potholes (sprite exists), cones, oil slicks
@@ -40,12 +40,12 @@ Status of the features, mechanics and release tasks agreed so far. `[x]` done on
 - [x] 60 fps on mobile (PR #5)
 - [ ] Heat / battery test on device
 - [ ] Company name, package ID (`com.<you>.tinyroadtrip`, permanent), app icons
-- [ ] IL2CPP + ARM64 (currently Mono + ARMv7 only; Play requires 64-bit), AAB build
+- [~] IL2CPP + ARM64 + ARMv7 set, test APK builds (`feature/traffic-patterns`); tick "Build App Bundle" for the Play upload
 - [ ] Upload keystore — back it up in two places; losing it blocks updates
-- [ ] Target SDK check, bump version code each upload, R8 minify
-- [ ] Remove unused content: analytics and AI packages from release, TMP Examples & Extras, `Scene2 Level`, unused Visual Scripting graphs
+- [~] R8 minify on; target SDK auto (36 installed); bump version code each upload
+- [ ] Remove unused content (test APK is 74 MB; `com.unity.ai.inference` adds Sentis shaders to the build): analytics and AI packages from release, TMP Examples & Extras, `Scene2 Level`, unused Visual Scripting graphs
 - [ ] Replace placeholder art: power-up orbs, coin, shield, nitro
-- [ ] Play Console: listing, screenshots, feature graphic, privacy policy, Data safety, content rating
+- [~] Text drafts in `docs/STORE_LISTING.md` + `docs/PRIVACY_POLICY.md`. Play Console: listing, screenshots, feature graphic, privacy policy, Data safety, content rating
 - [ ] Closed test: 12+ testers for 14 days (start early)
 - [ ] itch.io: WebGL module, Gzip + decompression fallback, portrait embed, page art
 
