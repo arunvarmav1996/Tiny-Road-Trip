@@ -372,4 +372,53 @@ namespace TinyRoadTrip.Gameplay.Tests
             Assert.Greater(calm, startOfBusy * 1.9f, "calm phase sends fewer cars");
         }
     }
+
+    public class TrafficPatternsTests
+    {
+        [Test]
+        public void EveryRowLeavesTwoLanesOpenAndLanesAreDistinct()
+        {
+            var rng = new System.Random(1234);
+            var slots = new System.Collections.Generic.List<CarSlot>();
+            foreach (TrafficPatternKind kind in System.Enum.GetValues(typeof(TrafficPatternKind)))
+            {
+                for (int n = 0; n < 200; n++)
+                {
+                    int rows = TrafficPatterns.Build(kind, 5, rng, slots);
+                    for (int row = 0; row < rows; row++)
+                    {
+                        var used = new System.Collections.Generic.HashSet<int>();
+                        foreach (var s in slots)
+                        {
+                            if (s.Row != row) continue;
+                            Assert.IsTrue(s.Lane >= 0 && s.Lane < 5, kind + " lane in range");
+                            Assert.IsTrue(used.Add(s.Lane), kind + " no two cars in one lane of a row");
+                        }
+                        Assert.LessOrEqual(used.Count, 5 - TrafficPatterns.MinOpenLanes, kind + " leaves a way through");
+                    }
+                }
+            }
+        }
+
+        [Test]
+        public void HardPatternsUnlockWithDifficulty()
+        {
+            Assert.AreEqual(0f, TrafficPatterns.Weight(TrafficPatternKind.Wall, 0.1f));
+            Assert.AreEqual(0f, TrafficPatterns.Weight(TrafficPatternKind.Zigzag, 0.3f));
+            Assert.Greater(TrafficPatterns.Weight(TrafficPatternKind.Wall, 0.8f), 0f);
+            Assert.Greater(TrafficPatterns.Weight(TrafficPatternKind.Zigzag, 0.8f), 0f);
+            Assert.AreEqual(TrafficPatternKind.Single, TrafficPatterns.Pick(0f, 0.5), "start of a run is mostly single cars");
+        }
+
+        [Test]
+        public void ZigzagAlternatesSides()
+        {
+            var slots = new System.Collections.Generic.List<CarSlot>();
+            int rows = TrafficPatterns.Build(TrafficPatternKind.Zigzag, 5, new System.Random(7), slots);
+            Assert.AreEqual(3, rows);
+            bool row0Left = slots.Find(s => s.Row == 0).Lane < 2;
+            bool row1Left = slots.Find(s => s.Row == 1).Lane < 2;
+            Assert.AreNotEqual(row0Left, row1Left);
+        }
+    }
 }

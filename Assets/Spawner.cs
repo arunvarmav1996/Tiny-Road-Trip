@@ -16,6 +16,10 @@ public class Spawner : MonoBehaviour
     [Header("Difficulty")]
     [Tooltip("Car speed and spawn spacing over the run: fast early ramp that levels off, plus busy/calm traffic waves.")]
     [SerializeField] private TinyRoadTrip.Gameplay.Core.DifficultyCurve difficulty = new TinyRoadTrip.Gameplay.Core.DifficultyCurve();
+    [Tooltip("Spawn traffic patterns (pairs, walls with gaps, zigzags) as difficulty rises. Off = one random car per spawn.")]
+    [SerializeField] private bool usePatterns = true;
+    [Tooltip("Vertical spacing (world units) between the rows of a multi-row pattern.")]
+    [SerializeField] private float patternRowGap = 2.6f;
 
     [Header("Screen Adaptation")]
     [Tooltip("Aspect-ratio lane formula from the Difficulty-Setup branch. Off by default: ResponsiveCamera already " +
@@ -104,8 +108,9 @@ public class Spawner : MonoBehaviour
 
         if (timer>= _obstacleSpawnTime)
         {
-            SpawnObstacle();
-            timer = 0f;
+            int rows = SpawnPattern();
+            // A multi-row pattern is taller than one car; hold the next spawn until its last row has entered.
+            timer = _obstacleSpeed > 0f ? -(rows - 1) * patternRowGap / _obstacleSpeed : 0f;
 
         }
 
@@ -115,14 +120,29 @@ public class Spawner : MonoBehaviour
 
     }
 
-    void SpawnObstacle()
-    {
-        if(lanePositions.Length == 0 || obstacleSprites.Count == 0)
-        return;
+    private readonly System.Random patternRandom = new System.Random();
+    private readonly List<TinyRoadTrip.Gameplay.Core.CarSlot> patternSlots = new List<TinyRoadTrip.Gameplay.Core.CarSlot>();
 
-        int randomLane = Random.Range(0, lanePositions.Length);
+    // Returns the number of rows spawned.
+    int SpawnPattern()
+    {
+        if (lanePositions.Length == 0 || obstacleSprites.Count == 0)
+            return 1;
+
+        var kind = TinyRoadTrip.Gameplay.Core.TrafficPatternKind.Single;
+        if (usePatterns && !IsCalmPhase)
+            kind = TinyRoadTrip.Gameplay.Core.TrafficPatterns.Pick(difficulty.Level(timeAlive), patternRandom.NextDouble());
+
+        int rows = TinyRoadTrip.Gameplay.Core.TrafficPatterns.Build(kind, lanePositions.Length, patternRandom, patternSlots);
+        foreach (var slot in patternSlots)
+            SpawnObstacle(slot.Lane, slot.Row * patternRowGap);
+        return Mathf.Max(1, rows);
+    }
+
+    void SpawnObstacle(int lane, float heightAboveSpawn)
+    {
         int randomSpriteIndex = Random.Range(0, obstacleSprites.Count);
-        Vector3 spawnPosition = lanePositions[randomLane].position;
+        Vector3 spawnPosition = lanePositions[lane].position + new Vector3(0f, heightAboveSpawn, 0f);
         Vector2 velocity = new Vector2(0,-_obstacleSpeed * SpeedMultiplier);
 
         GameObject obs;
