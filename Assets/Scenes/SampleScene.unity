@@ -400,9 +400,9 @@ RectTransform:
   - {fileID: 448459924}
   m_Father: {fileID: 285946344}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 320, y: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 320, y: 90}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &68908784
@@ -677,10 +677,17 @@ MonoBehaviour:
   - {fileID: 1524400971}
   - {fileID: 1769524343}
   - {fileID: 1556815187}
-  spawnInterval: 1.5
-  obstacleSpawnTimeFactor: 0.1
-  obstacleSpeed: 2
-  obstacleSpeedFactor: 0.2
+  difficulty:
+    StartSpeed: 2.5
+    MaxSpeed: 5.5
+    StartInterval: 1.4
+    MinInterval: 0.75
+    RampTime: 45
+    WarmUp: 12
+    BusyDuration: 20
+    CalmDuration: 6
+    BusyPeakIntervalMultiplier: 0.85
+    CalmIntervalMultiplier: 1.9
   adaptLanesToAspect: 0
   speedController: {fileID: 1917952524}
   despawnBelowY: -12
@@ -4873,9 +4880,9 @@ RectTransform:
   - {fileID: 1036230811}
   m_Father: {fileID: 285946344}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 320, y: -306}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 320, y: 90}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &1195837608
@@ -8134,9 +8141,9 @@ RectTransform:
   - {fileID: 918839503}
   m_Father: {fileID: 285946344}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 320, y: -204}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 320, y: 90}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &1805379404
@@ -8578,6 +8585,9 @@ GameObject:
   - component: {fileID: 1917952534}
   - component: {fileID: 1917952535}
   - component: {fileID: 1917952536}
+  - component: {fileID: 1917952539}
+  - component: {fileID: 1917952538}
+  - component: {fileID: 1917952537}
   m_Layer: 0
   m_Name: GameplaySystems
   m_TagString: Untagged
@@ -8813,6 +8823,63 @@ MonoBehaviour:
   nearMissShakeDuration: 0.12
   sparkCount: 14
   sparkColor: {r: 1, g: 0.85, b: 0.3, a: 1}
+--- !u!114 &1917952537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1917952523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 842eb61a408b68843994e0129d268342, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TinyRoadTrip.Gameplay.SpeedLines
+  powerUpManager: {fileID: 1917952527}
+  targetCamera: {fileID: 519420031}
+  emissionRate: 45
+  lineSpeed: 28
+  lineColor: {r: 1, g: 1, b: 1, a: 0.35}
+--- !u!114 &1917952538
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1917952523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10ee1d306cd4acc469928f288212a1ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TinyRoadTrip.Gameplay.SwipeHint
+  player: {fileID: 395117822}
+  showDuration: 3.5
+  startDelay: 0.4
+  fadeDuration: 0.35
+  sweepDistance: 220
+  sweepSpeed: 2.2
+  message: SWIPE TO DODGE
+--- !u!114 &1917952539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1917952523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c9c704934ed6124ead22884cf730bd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TinyRoadTrip.Gameplay.CoinChime
+  collectibleSpawner: {fileID: 1642919356}
+  comboManager: {fileID: 1917952526}
+  volume: 0.35
+  baseFrequency: 1320
+  chainWindow: 0.7
+  pitchStepPerCoin: 0.05
+  maxChainSteps: 8
+  pitchStepPerCombo: 0.04
+  maxComboSteps: 6
 --- !u!1 &1934025364
 GameObject:
   m_ObjectHideFlags: 0
@@ -8848,9 +8915,9 @@ RectTransform:
   - {fileID: 55550138}
   m_Father: {fileID: 285946344}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 320, y: -102}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 320, y: 90}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &1934025366
