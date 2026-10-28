@@ -98,3 +98,10 @@ InitTestScene*.unity*
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 *.slnx
+
+# Burst debug symbols written next to player builds
+*_BurstDebugInformation_DoNotShip/
+
+# Unity crash-recovery scenes (local only)
+/[Aa]ssets/_Recovery/
+/[Aa]ssets/_Recovery.meta
