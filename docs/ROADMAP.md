@@ -39,7 +39,7 @@ Status of the features, mechanics and release tasks agreed so far. `[x]` done on
 - [x] Branches merged, real-device touch test
 - [x] 60 fps on mobile (PR #5)
 - [ ] Heat / battery test on device
-- [ ] Company name, package ID (`com.<you>.tinyroadtrip`, permanent), app icons
+- [~] Company "Pandora Kreations", package ID `com.pandorakreations.tinyroadtrip` (permanent after first Play upload), v0.1.0 — app icon still to do
 - [~] IL2CPP + ARM64 + ARMv7 set, test APK builds (`feature/traffic-patterns`); tick "Build App Bundle" for the Play upload
 - [ ] Upload keystore — back it up in two places; losing it blocks updates
 - [~] R8 minify on; target SDK auto (36 installed); bump version code each upload
