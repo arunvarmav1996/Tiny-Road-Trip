@@ -421,4 +421,84 @@ namespace TinyRoadTrip.Gameplay.Tests
             Assert.AreNotEqual(row0Left, row1Left);
         }
     }
+
+    public class TrafficVarietyTests
+    {
+        private static System.Collections.Generic.List<LaneCar> Cars(params (int lane, float y)[] cars)
+        {
+            var list = new System.Collections.Generic.List<LaneCar>();
+            foreach (var c in cars) list.Add(new LaneCar(c.lane, c.y));
+            return list;
+        }
+
+        [Test]
+        public void SpeedFactor_OnlyAfterUnlockAndWithinSpread()
+        {
+            var v = new TrafficVariety { VarietyUnlockLevel = 0.1f, MaxVariedChance = 0.5f, SpeedSpread = 0.2f };
+            Assert.AreEqual(1f, v.RollSpeedFactor(0.05f, 0.0, 0.0), "no variety at the start of a run");
+            Assert.AreEqual(0.8f, v.RollSpeedFactor(1f, 0.0, 0.0), 1e-5f);
+            Assert.AreEqual(1.2f, v.RollSpeedFactor(1f, 0.0, 1.0), 1e-5f);
+            Assert.AreEqual(1f, v.RollSpeedFactor(1f, 0.6, 0.0), "chance tops out at MaxVariedChance");
+        }
+
+        [Test]
+        public void LaneChange_UnlocksLater()
+        {
+            var v = new TrafficVariety { LaneChangeUnlockLevel = 0.3f, MaxLaneChangeChance = 0.3f };
+            Assert.IsFalse(v.RollLaneChange(0.25f, 0.0));
+            Assert.IsTrue(v.RollLaneChange(1f, 0.29));
+            Assert.IsFalse(v.RollLaneChange(1f, 0.31));
+        }
+
+        [Test]
+        public void TargetLane_EdgesTurnInwards()
+        {
+            Assert.AreEqual(1, TrafficVariety.PickTargetLane(0, 5, 0.1));
+            Assert.AreEqual(3, TrafficVariety.PickTargetLane(4, 5, 0.9));
+            Assert.AreEqual(1, TrafficVariety.PickTargetLane(2, 5, 0.1));
+            Assert.AreEqual(3, TrafficVariety.PickTargetLane(2, 5, 0.9));
+        }
+
+        [Test]
+        public void Follow_FasterCarMatchesCarAheadOnlyWhenClose()
+        {
+            var v = new TrafficVariety { FollowGap = 1.7f };
+            Assert.AreEqual(3f, v.FollowSpeed(4f, 3f, 1.6f));
+            Assert.AreEqual(4f, v.FollowSpeed(4f, 3f, 2.5f), "far behind: keeps its speed");
+            Assert.AreEqual(3f, v.FollowSpeed(3f, 4f, 1.0f), "slower car never speeds up");
+        }
+
+        [Test]
+        public void CountBlockedLanes_CountsDistinctLanesInBand()
+        {
+            var cars = Cars((0, 5f), (0, 5.2f), (2, 5.5f), (3, 9f));
+            Assert.AreEqual(2, TrafficVariety.CountBlockedLanes(cars, -1, 5f, 1.4f, -1));
+            Assert.AreEqual(3, TrafficVariety.CountBlockedLanes(cars, -1, 5f, 1.4f, 4));
+            Assert.AreEqual(2, TrafficVariety.CountBlockedLanes(cars, 2, 5f, 1.4f, 4), "skipped car not counted");
+        }
+
+        [Test]
+        public void LaneChange_NeedsClearTargetAndAWayThrough()
+        {
+            var v = new TrafficVariety { LaneClearance = 2.4f, RowBand = 1.4f };
+            // Car 0 in lane 2 wants lane 3; lane 3 has a car 2 units above.
+            Assert.IsFalse(v.CanChangeLane(Cars((2, 3f), (3, 5f)), 0, 3, 5));
+            Assert.IsTrue(v.CanChangeLane(Cars((2, 3f), (3, 6f)), 0, 3, 5));
+            // Lanes 0 and 1 blocked in the same row: moving into 3 leaves lanes 2 and 4 open.
+            Assert.IsTrue(v.CanChangeLane(Cars((2, 3f), (0, 3f), (1, 3f)), 0, 3, 5));
+            // Lanes 0, 1 and 4 blocked: moving into 3 leaves one lane: refused.
+            Assert.IsFalse(v.CanChangeLane(Cars((2, 3f), (0, 3f), (1, 3f), (4, 3f)), 0, 3, 5));
+        }
+
+        [Test]
+        public void RowGuard_StopsVariedCarClosingAWall()
+        {
+            var v = new TrafficVariety { RowBand = 1.4f, RowGuardMargin = 0.6f };
+            // Wall in lanes 0, 1, 2; varied car in lane 3 approaching from 1.8 above.
+            var cars = Cars((0, 0f), (1, 0f), (2, 0f), (3, 1.8f));
+            Assert.IsTrue(v.WouldCloseRow(cars, 3, 5));
+            Assert.IsFalse(v.WouldCloseRow(Cars((0, 0f), (1, 0f), (3, 1.8f)), 2, 5), "two open lanes left");
+            Assert.IsFalse(v.WouldCloseRow(Cars((0, 0f), (1, 0f), (2, 0f), (3, 4f)), 3, 5), "still far away");
+        }
+    }
 }
