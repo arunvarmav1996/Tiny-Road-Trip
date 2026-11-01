@@ -508,7 +508,8 @@ namespace TinyRoadTrip.Gameplay.Tests
         {
             return new WeatherSchedule { WarmUp = 10f, MinClear = 5f, MaxClear = 5f, MinDuration = 20f, MaxDuration = 20f,
                                          WarningTime = 2f, FadeTime = 4f, MaxCalmWait = 8f, WarningVisual = 0.4f,
-                                         SnowWeight = 0f }; // rain only unless a test turns snow on
+                                         SnowWeight = 0f, SpringWeight = 0f, SummerWeight = 0f, FallWeight = 0f };
+            // rain only unless a test turns others on
         }
 
         private static void Run(WeatherSchedule w, float seconds, bool calm, System.Random rng)
@@ -615,7 +616,7 @@ namespace TinyRoadTrip.Gameplay.Tests
         public void SameWeatherNeverTwiceInARow()
         {
             var w = Make();
-            w.SnowWeight = 1f;
+            w.SnowWeight = w.SpringWeight = w.SummerWeight = w.FallWeight = 1f;
             var rng = new System.Random(42);
             var spells = new System.Collections.Generic.List<WeatherKind>();
             WeatherKind current = WeatherKind.Clear;
@@ -628,6 +629,9 @@ namespace TinyRoadTrip.Gameplay.Tests
             Assert.Greater(spells.Count, 20);
             Assert.Contains(WeatherKind.Rain, spells);
             Assert.Contains(WeatherKind.Snow, spells);
+            Assert.Contains(WeatherKind.Spring, spells);
+            Assert.Contains(WeatherKind.Summer, spells);
+            Assert.Contains(WeatherKind.Fall, spells);
             for (int i = 1; i < spells.Count; i++)
                 Assert.AreNotEqual(spells[i - 1], spells[i], "spell " + i);
         }
@@ -659,6 +663,22 @@ namespace TinyRoadTrip.Gameplay.Tests
             Assert.AreEqual(1f, WeatherRules.WorldSpeedFactor(WeatherKind.Snow, 0f));
             Assert.Less(WeatherRules.SteerFactor(WeatherKind.Snow, 1f), WeatherRules.SteerFactor(WeatherKind.Rain, 1f), "ice is worse than rain");
             Assert.Greater(WeatherRules.SnowWorldSpeed * WeatherRules.SnowDistanceBonus, 1f, "snow still pays off");
+        }
+
+        [Test]
+        public void SeasonRules_SpringIsABreatherSummerIsFastFallIsSlippery()
+        {
+            Assert.AreEqual(1f, WeatherRules.SteerFactor(WeatherKind.Spring, 1f));
+            Assert.AreEqual(1f, WeatherRules.WorldSpeedFactor(WeatherKind.Spring, 1f));
+            Assert.Greater(WeatherRules.DistanceFactor(WeatherKind.Spring, 1f), 1f);
+
+            Assert.Greater(WeatherRules.WorldSpeedFactor(WeatherKind.Summer, 1f), 1f);
+            Assert.AreEqual(1f, WeatherRules.SteerFactor(WeatherKind.Summer, 1f));
+
+            float fallSteer = WeatherRules.SteerFactor(WeatherKind.Fall, 1f);
+            Assert.Less(fallSteer, 1f);
+            Assert.Greater(fallSteer, WeatherRules.SteerFactor(WeatherKind.Rain, 1f), "leaves are milder than rain");
+            Assert.AreEqual(1f, WeatherRules.WorldSpeedFactor(WeatherKind.Fall, 1f));
         }
 
         [Test]

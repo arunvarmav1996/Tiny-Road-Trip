@@ -7,6 +7,9 @@ namespace TinyRoadTrip.Gameplay.Core
         Clear = 0,
         Rain = 1,
         Snow = 2,
+        Spring = 3,
+        Summer = 4,
+        Fall = 5,
     }
 
     // Weather over one run: clear spells alternate with weather spells picked at random by weight
@@ -30,6 +33,9 @@ namespace TinyRoadTrip.Gameplay.Core
 
         public float RainWeight = 1f;
         public float SnowWeight = 1f;
+        public float SpringWeight = 1f;
+        public float SummerWeight = 1f;
+        public float FallWeight = 1f;
 
         public enum Phase { Clear, Warning, FadeIn, Active, FadeOut }
 
@@ -136,6 +142,9 @@ namespace TinyRoadTrip.Gameplay.Core
             weights[(int)WeatherKind.Clear] = 0f;
             weights[(int)WeatherKind.Rain] = RainWeight;
             weights[(int)WeatherKind.Snow] = SnowWeight;
+            weights[(int)WeatherKind.Spring] = SpringWeight;
+            weights[(int)WeatherKind.Summer] = SummerWeight;
+            weights[(int)WeatherKind.Fall] = FallWeight;
 
             float others = 0f;
             for (int i = 1; i < weights.Length; i++)
@@ -159,6 +168,9 @@ namespace TinyRoadTrip.Gameplay.Core
     //   Rain: slippery steering, small score bonus.
     //   Snow: the whole world slows (careful driving) but steering is icier still; bigger score bonus,
     //         so the net distance per second is still a little higher than in clear weather.
+    //   Spring: a breather. No handicap, small score bonus.
+    //   Summer: hot asphalt, the world runs a little faster; score bonus to match.
+    //   Fall: leaves on the road make steering a little slippery; score bonus.
     public static class WeatherRules
     {
         public const float RainSteerFactor = 0.55f;    // lane changes at 55% speed: the road is slippery
@@ -166,6 +178,11 @@ namespace TinyRoadTrip.Gameplay.Core
         public const float SnowSteerFactor = 0.4f;
         public const float SnowWorldSpeed = 0.8f;      // road, cars and coins at 80% speed
         public const float SnowDistanceBonus = 1.4f;
+        public const float SpringDistanceBonus = 1.1f;
+        public const float SummerWorldSpeed = 1.1f;
+        public const float SummerDistanceBonus = 1.15f;
+        public const float FallSteerFactor = 0.8f;
+        public const float FallDistanceBonus = 1.15f;
 
         public static float SteerFactor(WeatherKind kind, float rule)
         {
@@ -173,6 +190,7 @@ namespace TinyRoadTrip.Gameplay.Core
             {
                 case WeatherKind.Rain: return Lerp(1f, RainSteerFactor, rule);
                 case WeatherKind.Snow: return Lerp(1f, SnowSteerFactor, rule);
+                case WeatherKind.Fall: return Lerp(1f, FallSteerFactor, rule);
                 default: return 1f;
             }
         }
@@ -183,6 +201,9 @@ namespace TinyRoadTrip.Gameplay.Core
             {
                 case WeatherKind.Rain: return Lerp(1f, RainDistanceBonus, rule);
                 case WeatherKind.Snow: return Lerp(1f, SnowDistanceBonus, rule);
+                case WeatherKind.Spring: return Lerp(1f, SpringDistanceBonus, rule);
+                case WeatherKind.Summer: return Lerp(1f, SummerDistanceBonus, rule);
+                case WeatherKind.Fall: return Lerp(1f, FallDistanceBonus, rule);
                 default: return 1f;
             }
         }
@@ -193,6 +214,7 @@ namespace TinyRoadTrip.Gameplay.Core
             switch (kind)
             {
                 case WeatherKind.Snow: return Lerp(1f, SnowWorldSpeed, rule);
+                case WeatherKind.Summer: return Lerp(1f, SummerWorldSpeed, rule);
                 default: return 1f;
             }
         }
