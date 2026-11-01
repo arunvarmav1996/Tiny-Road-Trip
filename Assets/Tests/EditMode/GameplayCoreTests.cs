@@ -507,4 +507,87 @@ namespace TinyRoadTrip.Gameplay.Tests
             Assert.IsFalse(v.WouldCloseRow(Cars((0, 0f), (1, 0f), (2, 0f), (3, 4f)), 3, 5), "still far away");
         }
     }
+
+    public class TrafficGapsTests
+    {
+        private static readonly System.Collections.Generic.List<GapCar> None = new System.Collections.Generic.List<GapCar>();
+
+        private static System.Collections.Generic.List<GapCar> Cars(params GapCar[] cars)
+        {
+            return new System.Collections.Generic.List<GapCar>(cars);
+        }
+
+        [Test]
+        public void MinClearGap_ScalesWithPlayerLengthAndTightensWithDifficulty()
+        {
+            var g = new TrafficGaps { EasyGapFactor = 1.8f, HardGapFactor = 1.3f };
+            Assert.AreEqual(1.8f * 1.66f, g.MinClearGap(1.66f, 0f), 1e-4f);
+            Assert.AreEqual(1.3f * 1.66f, g.MinClearGap(1.66f, 1f), 1e-4f);
+            Assert.AreEqual(2f * g.MinClearGap(1f, 0.5f), g.MinClearGap(2f, 0.5f), 1e-4f, "a car twice as long gets twice the window");
+            Assert.Less(g.MinClearGap(1.66f, 0.6f), g.MinClearGap(1.66f, 0.2f));
+        }
+
+        [Test]
+        public void CentreDistance_IsHalfOfEachCarPlusTheWindow()
+        {
+            Assert.AreEqual(0.5f * (1.33f + 2.4f) + 3f, TrafficGaps.CentreDistance(1.33f, 2.4f, 3f), 1e-4f);
+        }
+
+        [Test]
+        public void SideBySideInARowIsFineButStaggeredSqueezeIsNot()
+        {
+            var g = new TrafficGaps { AlignTolerance = 0.3f };
+            var a = new GapCar(0, 10f, 1.33f);
+            Assert.IsFalse(g.TooClose(a, new GapCar(1, 10.1f, 1.33f), 2.5f), "row pair");
+            Assert.IsTrue(g.TooClose(a, new GapCar(0, 10.1f, 1.33f), 2.5f), "same lane, same spot");
+            Assert.IsTrue(g.TooClose(a, new GapCar(1, 12f, 1.33f), 2.5f), "staggered: window under 2.5");
+            Assert.IsFalse(g.TooClose(a, new GapCar(1, 13.9f, 1.33f), 2.5f), "a full window apart");
+        }
+
+        [Test]
+        public void Lift_IsZeroOnAnEmptyRoadAndRaisesPastCloseCars()
+        {
+            var g = new TrafficGaps();
+            var incoming = Cars(new GapCar(2, 8f, 1.33f));
+            Assert.AreEqual(0f, g.Lift(None, incoming, 2.5f, 5));
+
+            var existing = Cars(new GapCar(1, 7f, 1.33f)); // one unit below, other lane
+            float lift = g.Lift(existing, incoming, 2.5f, 5);
+            Assert.AreEqual(7f + TrafficGaps.CentreDistance(1.33f, 1.33f, 2.5f) - 8f, lift, 1e-4f);
+        }
+
+        [Test]
+        public void Lift_AllowsJoiningARowOnlyWhileItLeavesAWayThrough()
+        {
+            var g = new TrafficGaps();
+            var pairRow = Cars(new GapCar(0, 8f, 1.33f), new GapCar(1, 8f, 1.33f));
+            Assert.AreEqual(0f, g.Lift(pairRow, Cars(new GapCar(3, 8f, 1.33f)), 2.5f, 5), "third car in the row: two lanes still open");
+
+            var wall = Cars(new GapCar(0, 8f, 1.33f), new GapCar(1, 8f, 1.33f), new GapCar(2, 8f, 1.33f));
+            float lift = g.Lift(wall, Cars(new GapCar(4, 8f, 1.33f)), 2.5f, 5);
+            Assert.GreaterOrEqual(lift, TrafficGaps.CentreDistance(1.33f, 1.33f, 2.5f) - 1e-4f, "a fourth car would close the row");
+        }
+
+        [Test]
+        public void Lift_KeepsEveryNewCarClearOfEveryOldCar()
+        {
+            var g = new TrafficGaps();
+            var rng = new System.Random(11);
+            for (int n = 0; n < 300; n++)
+            {
+                var existing = new System.Collections.Generic.List<GapCar>();
+                for (int i = 0; i < 6; i++) existing.Add(new GapCar(rng.Next(5), 4f + (float)rng.NextDouble() * 8f, 1.33f));
+                var incoming = Cars(new GapCar(rng.Next(5), 9f, 1.33f), new GapCar(rng.Next(5), 9f + 4.5f, 1.33f));
+                if (incoming[0].Lane == incoming[1].Lane) continue;
+                float lift = g.Lift(existing, incoming, 2.5f, 5);
+                foreach (var c in incoming)
+                {
+                    var moved = new GapCar(c.Lane, c.Y + lift, c.Length);
+                    foreach (var e in existing)
+                        Assert.IsFalse(g.TooClose(moved, e, 2.5f) && System.Math.Abs(moved.Y - e.Y) > g.AlignTolerance,
+                            "new car at " + moved.Y + " too close to " + e.Y);
+                }
+            }
+        }
+    }
 }
