@@ -57,7 +57,11 @@ namespace TinyRoadTrip.Gameplay
             { tint = new Color(1f, 0.86f, 0.93f), tintStrength = 0.3f, saturation = 1.35f, contrast = 1.08f, brightness = 1.05f };
         [Tooltip("Each petal picks a random colour along this gradient.")]
         [SerializeField] private Gradient petalColors = DefaultPetalColors();
-        [SerializeField] private float petalEmissionRate = 24f;
+        [Tooltip("Average petals per second. The actual rate drifts with slow gusts around this.")]
+        [SerializeField] private float petalEmissionRate = 6f;
+        [Tooltip("0 = steady stream, 1 = petals come in clear gusts with near-empty lulls between.")]
+        [Range(0f, 1f)]
+        [SerializeField] private float petalGustiness = 0.8f;
         [SerializeField] private float petalFallSpeed = 1.1f;
         [SerializeField] private float petalWobble = 0.9f;
 
@@ -164,7 +168,7 @@ namespace TinyRoadTrip.Gameplay
             SetRate(splashes, splashEmissionRate * rainLevel);
             SetRate(snow, snowEmissionRate * snowLevel);
             SetRate(settledSnow, settledEmissionRate * snowLevel);
-            SetRate(petals, petalEmissionRate * springLevel);
+            SetRate(petals, petalEmissionRate * springLevel * Gust(petalGustiness));
             SetRate(motes, moteEmissionRate * summerLevel);
             SetRate(leaves, leafEmissionRate * fallLevel);
             SetRate(settledLeaves, settledLeafEmissionRate * fallLevel);
@@ -203,6 +207,14 @@ namespace TinyRoadTrip.Gameplay
             appliedWorldSpeed = factor;
             if (factor == 1f) speedController.ClearModifier(SpeedSource.Weather);
             else speedController.SetModifier(SpeedSource.Weather, factor);
+        }
+
+        // Slowly wandering multiplier averaging about 1: a breeze picks up and dies down every few seconds,
+        // so petals arrive in loose drifts with quiet gaps instead of a steady stream.
+        private static float Gust(float gustiness)
+        {
+            float breeze = Mathf.PerlinNoise(Time.time * 0.15f, 0.37f) * 2f - 1f; // smooth, -1..1
+            return Mathf.Max(0f, 1f + breeze * 1.4f * gustiness);
         }
 
         private static void SetRate(ParticleSystem ps, float rate)

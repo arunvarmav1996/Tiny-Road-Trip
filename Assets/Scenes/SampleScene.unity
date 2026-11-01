@@ -5428,7 +5428,8 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
-  petalEmissionRate: 24
+  petalEmissionRate: 6
+  petalGustiness: 0.8
   petalFallSpeed: 1.1
   petalWobble: 0.9
   summerGrade:
