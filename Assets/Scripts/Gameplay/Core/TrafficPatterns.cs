@@ -19,21 +19,33 @@ namespace TinyRoadTrip.Gameplay.Core
     }
 
     // Traffic pattern selection and layout. Fairness rule: every row leaves at least MinOpenLanes lanes free,
-    // so there is always a way through. Harder patterns unlock as the difficulty level (0..1) rises.
+    // so there is always a way through. Harder patterns unlock as the difficulty level (0..1) rises, each starting
+    // at zero weight at its unlock level and growing from there, so a new pattern shows up rarely at first.
     public static class TrafficPatterns
     {
         public const int MinOpenLanes = 2;
+
+        public const float PairUnlock = 0.08f;
+        public const float WallUnlock = 0.35f;
+        public const float ZigzagUnlock = 0.5f;
 
         public static float Weight(TrafficPatternKind kind, float level)
         {
             switch (kind)
             {
                 case TrafficPatternKind.Single: return 1f;
-                case TrafficPatternKind.Pair: return 0.1f + 0.6f * level;
-                case TrafficPatternKind.Wall: return level < 0.3f ? 0f : 0.5f * level;
-                case TrafficPatternKind.Zigzag: return level < 0.45f ? 0f : 0.45f * level;
+                case TrafficPatternKind.Pair: return EaseIn(level, PairUnlock, 0.7f);
+                case TrafficPatternKind.Wall: return EaseIn(level, WallUnlock, 0.5f);
+                case TrafficPatternKind.Zigzag: return EaseIn(level, ZigzagUnlock, 0.45f);
                 default: return 0f;
             }
+        }
+
+        // 0 below unlock, then rising linearly to maxWeight at level 1.
+        private static float EaseIn(float level, float unlock, float maxWeight)
+        {
+            if (level <= unlock) return 0f;
+            return maxWeight * (level - unlock) / (1f - unlock);
         }
 
         // r01: uniform random in [0, 1).

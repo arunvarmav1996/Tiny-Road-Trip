@@ -328,23 +328,27 @@ namespace TinyRoadTrip.Gameplay.Tests
     public class DifficultyCurveTests
     {
         [Test]
-        public void Level_RisesFastEarlyThenLevelsOff()
+        public void Level_ZeroThroughGraceThenEasesInGradually()
         {
-            var c = new DifficultyCurve { RampTime = 45f };
+            var c = new DifficultyCurve { Grace = 20f, RampTime = 90f };
             Assert.AreEqual(0f, c.Level(0f), 1e-5f);
-            float early = c.Level(30f) - c.Level(0f);
-            float late = c.Level(150f) - c.Level(120f);
-            Assert.Greater(early, late * 5f, "first 30 s must ramp much more than a late 30 s");
-            Assert.Less(c.Level(600f), 1.0001f);
+            Assert.AreEqual(0f, c.Level(19.9f), 1e-5f, "grace period: no ramp at all");
+            Assert.AreEqual(0.5f, c.Level(110f), 1e-4f, "half way after one RampTime");
+            float firstHalfMinute = c.Level(50f) - c.Level(20f);
+            float secondHalfMinute = c.Level(80f) - c.Level(50f);
+            Assert.Less(firstHalfMinute, secondHalfMinute, "eases in: the first stretch after grace is the gentlest");
+            Assert.Less(c.Level(50f), 0.12f, "half a minute after grace is still easy");
+            Assert.Less(c.Level(10000f), 1.0001f);
+            Assert.Greater(c.Level(1000f), 0.98f);
         }
 
         [Test]
         public void Speed_GoesFromStartTowardsMaxAndIgnoresWaves()
         {
-            var c = new DifficultyCurve { StartSpeed = 2.5f, MaxSpeed = 5.5f, WarmUp = 0f, BusyDuration = 10f, CalmDuration = 5f };
+            var c = new DifficultyCurve { StartSpeed = 2.5f, MaxSpeed = 5.5f, Grace = 0f, WarmUp = 0f, BusyDuration = 10f, CalmDuration = 5f };
             Assert.AreEqual(2.5f, c.Speed(0f), 1e-4f);
-            Assert.Greater(c.Speed(300f), 5.4f);
-            Assert.LessOrEqual(c.Speed(300f), 5.5f);
+            Assert.Greater(c.Speed(2000f), 5.4f);
+            Assert.LessOrEqual(c.Speed(2000f), 5.5f);
             Assert.IsTrue(c.IsCalm(12f));
             Assert.Greater(c.Speed(12f), c.Speed(9f), "speed keeps rising through a calm phase");
         }
@@ -363,7 +367,7 @@ namespace TinyRoadTrip.Gameplay.Tests
         [Test]
         public void SpawnInterval_TightensInBusyAndLoosensInCalm()
         {
-            var c = new DifficultyCurve { RampTime = 1e6f, WarmUp = 0f, BusyDuration = 20f, CalmDuration = 6f,
+            var c = new DifficultyCurve { Grace = 1e6f, WarmUp = 0f, BusyDuration = 20f, CalmDuration = 6f,
                                           BusyPeakIntervalMultiplier = 0.8f, CalmIntervalMultiplier = 2f };
             float startOfBusy = c.SpawnInterval(0.01f);
             float endOfBusy = c.SpawnInterval(19.9f);
@@ -407,7 +411,9 @@ namespace TinyRoadTrip.Gameplay.Tests
             Assert.AreEqual(0f, TrafficPatterns.Weight(TrafficPatternKind.Zigzag, 0.3f));
             Assert.Greater(TrafficPatterns.Weight(TrafficPatternKind.Wall, 0.8f), 0f);
             Assert.Greater(TrafficPatterns.Weight(TrafficPatternKind.Zigzag, 0.8f), 0f);
-            Assert.AreEqual(TrafficPatternKind.Single, TrafficPatterns.Pick(0f, 0.5), "start of a run is mostly single cars");
+            Assert.AreEqual(TrafficPatternKind.Single, TrafficPatterns.Pick(0f, 0.999), "start of a run is single cars only");
+            Assert.AreEqual(0f, TrafficPatterns.Weight(TrafficPatternKind.Pair, 0f), "no pairs during grace");
+            Assert.Less(TrafficPatterns.Weight(TrafficPatternKind.Wall, 0.4f), 0.05f, "a new pattern starts rare");
         }
 
         [Test]
@@ -499,6 +505,89 @@ namespace TinyRoadTrip.Gameplay.Tests
             Assert.IsTrue(v.WouldCloseRow(cars, 3, 5));
             Assert.IsFalse(v.WouldCloseRow(Cars((0, 0f), (1, 0f), (3, 1.8f)), 2, 5), "two open lanes left");
             Assert.IsFalse(v.WouldCloseRow(Cars((0, 0f), (1, 0f), (2, 0f), (3, 4f)), 3, 5), "still far away");
+        }
+    }
+
+    public class TrafficGapsTests
+    {
+        private static readonly System.Collections.Generic.List<GapCar> None = new System.Collections.Generic.List<GapCar>();
+
+        private static System.Collections.Generic.List<GapCar> Cars(params GapCar[] cars)
+        {
+            return new System.Collections.Generic.List<GapCar>(cars);
+        }
+
+        [Test]
+        public void MinClearGap_ScalesWithPlayerLengthAndTightensWithDifficulty()
+        {
+            var g = new TrafficGaps { EasyGapFactor = 1.8f, HardGapFactor = 1.3f };
+            Assert.AreEqual(1.8f * 1.66f, g.MinClearGap(1.66f, 0f), 1e-4f);
+            Assert.AreEqual(1.3f * 1.66f, g.MinClearGap(1.66f, 1f), 1e-4f);
+            Assert.AreEqual(2f * g.MinClearGap(1f, 0.5f), g.MinClearGap(2f, 0.5f), 1e-4f, "a car twice as long gets twice the window");
+            Assert.Less(g.MinClearGap(1.66f, 0.6f), g.MinClearGap(1.66f, 0.2f));
+        }
+
+        [Test]
+        public void CentreDistance_IsHalfOfEachCarPlusTheWindow()
+        {
+            Assert.AreEqual(0.5f * (1.33f + 2.4f) + 3f, TrafficGaps.CentreDistance(1.33f, 2.4f, 3f), 1e-4f);
+        }
+
+        [Test]
+        public void SideBySideInARowIsFineButStaggeredSqueezeIsNot()
+        {
+            var g = new TrafficGaps { AlignTolerance = 0.3f };
+            var a = new GapCar(0, 10f, 1.33f);
+            Assert.IsFalse(g.TooClose(a, new GapCar(1, 10.1f, 1.33f), 2.5f), "row pair");
+            Assert.IsTrue(g.TooClose(a, new GapCar(0, 10.1f, 1.33f), 2.5f), "same lane, same spot");
+            Assert.IsTrue(g.TooClose(a, new GapCar(1, 12f, 1.33f), 2.5f), "staggered: window under 2.5");
+            Assert.IsFalse(g.TooClose(a, new GapCar(1, 13.9f, 1.33f), 2.5f), "a full window apart");
+        }
+
+        [Test]
+        public void Lift_IsZeroOnAnEmptyRoadAndRaisesPastCloseCars()
+        {
+            var g = new TrafficGaps();
+            var incoming = Cars(new GapCar(2, 8f, 1.33f));
+            Assert.AreEqual(0f, g.Lift(None, incoming, 2.5f, 5));
+
+            var existing = Cars(new GapCar(1, 7f, 1.33f)); // one unit below, other lane
+            float lift = g.Lift(existing, incoming, 2.5f, 5);
+            Assert.AreEqual(7f + TrafficGaps.CentreDistance(1.33f, 1.33f, 2.5f) - 8f, lift, 1e-4f);
+        }
+
+        [Test]
+        public void Lift_AllowsJoiningARowOnlyWhileItLeavesAWayThrough()
+        {
+            var g = new TrafficGaps();
+            var pairRow = Cars(new GapCar(0, 8f, 1.33f), new GapCar(1, 8f, 1.33f));
+            Assert.AreEqual(0f, g.Lift(pairRow, Cars(new GapCar(3, 8f, 1.33f)), 2.5f, 5), "third car in the row: two lanes still open");
+
+            var wall = Cars(new GapCar(0, 8f, 1.33f), new GapCar(1, 8f, 1.33f), new GapCar(2, 8f, 1.33f));
+            float lift = g.Lift(wall, Cars(new GapCar(4, 8f, 1.33f)), 2.5f, 5);
+            Assert.GreaterOrEqual(lift, TrafficGaps.CentreDistance(1.33f, 1.33f, 2.5f) - 1e-4f, "a fourth car would close the row");
+        }
+
+        [Test]
+        public void Lift_KeepsEveryNewCarClearOfEveryOldCar()
+        {
+            var g = new TrafficGaps();
+            var rng = new System.Random(11);
+            for (int n = 0; n < 300; n++)
+            {
+                var existing = new System.Collections.Generic.List<GapCar>();
+                for (int i = 0; i < 6; i++) existing.Add(new GapCar(rng.Next(5), 4f + (float)rng.NextDouble() * 8f, 1.33f));
+                var incoming = Cars(new GapCar(rng.Next(5), 9f, 1.33f), new GapCar(rng.Next(5), 9f + 4.5f, 1.33f));
+                if (incoming[0].Lane == incoming[1].Lane) continue;
+                float lift = g.Lift(existing, incoming, 2.5f, 5);
+                foreach (var c in incoming)
+                {
+                    var moved = new GapCar(c.Lane, c.Y + lift, c.Length);
+                    foreach (var e in existing)
+                        Assert.IsFalse(g.TooClose(moved, e, 2.5f) && System.Math.Abs(moved.Y - e.Y) > g.AlignTolerance,
+                            "new car at " + moved.Y + " too close to " + e.Y);
+                }
+            }
         }
     }
 }
