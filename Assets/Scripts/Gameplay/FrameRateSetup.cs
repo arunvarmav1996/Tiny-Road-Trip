@@ -12,8 +12,13 @@ namespace TinyRoadTrip.Gameplay
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Apply()
         {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            // Browsers pace frames to the display themselves; a fixed target only adds stutter there.
+            Application.targetFrameRate = -1;
+#else
             QualitySettings.vSyncCount = 0;
             Application.targetFrameRate = TargetFrameRate;
+#endif
         }
     }
 }

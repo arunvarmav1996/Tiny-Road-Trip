@@ -1,6 +1,5 @@
 using TinyRoadTrip.Gameplay;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -44,9 +43,6 @@ public static class GameOverSummarySetup
         Set(runStats, "comboManager", systems.GetComponent<ComboManager>());
         Set(runStats, "coinManager", systems.GetComponent<CoinManager>());
         Set(runStats, "distanceText", scoreUI.GetComponent<TMP_Text>());
-
-        ScriptMachine scoreGraph = scoreUI.GetComponent<ScriptMachine>();
-        if (scoreGraph != null) scoreGraph.enabled = false; // kept (disabled) so it can be switched back
 
         // Bonuses are distance now: near misses go through RunStats, Nitro's extra speed already adds distance.
         ComboManager combo = systems.GetComponent<ComboManager>();
