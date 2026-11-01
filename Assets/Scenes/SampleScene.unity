@@ -682,7 +682,8 @@ MonoBehaviour:
     MaxSpeed: 5.5
     StartInterval: 1.4
     MinInterval: 0.75
-    RampTime: 45
+    Grace: 20
+    RampTime: 90
     WarmUp: 12
     BusyDuration: 20
     CalmDuration: 6
