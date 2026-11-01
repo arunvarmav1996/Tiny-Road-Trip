@@ -18,7 +18,7 @@ Status of the features, mechanics and release tasks agreed so far. `[x]` done on
 - [ ] Optional: tap left/right half of the screen to steer
 - [~] Difficulty curve with busy/calm waves (`feature/difficulty-waves`)
 - [~] Traffic patterns: pairs, wall with gaps, zigzag + fairness rule (`feature/traffic-patterns`); slow clusters not done
-- [ ] Car speed variety; lane-changers with turn-signal blink
+- [~] Car speed variety; lane-changers with turn-signal blink (`feature/traffic-variety`)
 - [ ] Two-lane trucks (needs a wide sprite), parked cars
 - [ ] Road hazards: potholes (sprite exists), cones, oil slicks
 - [ ] Siren power-up: traffic pulls aside for 5 s ("Siren" sound already in `AudioManager`)

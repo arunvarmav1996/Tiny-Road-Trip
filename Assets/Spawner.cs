@@ -20,6 +20,9 @@ public class Spawner : MonoBehaviour
     [SerializeField] private bool usePatterns = true;
     [Tooltip("Vertical spacing (world units) between the rows of a multi-row pattern.")]
     [SerializeField] private float patternRowGap = 2.6f;
+    [Tooltip("Single cars get their own speed and some change lane (with a turn-signal blink) as difficulty rises.")]
+    [SerializeField] private bool useVariety = true;
+    [SerializeField] private TinyRoadTrip.Gameplay.Core.TrafficVariety variety = new TinyRoadTrip.Gameplay.Core.TrafficVariety();
 
     [Header("Screen Adaptation")]
     [Tooltip("Aspect-ratio lane formula from the Difficulty-Setup branch. Off by default: ResponsiveCamera already " +
@@ -51,7 +54,17 @@ public class Spawner : MonoBehaviour
         public bool NearMissResolved;
         public bool WasHit;
         public bool Pooled;
+
+        public int Lane;
+        public bool Varied;              // own speed; matches a row's speed rather than close its way through
+        public LaneChange Change;
+        public int TargetLane;
+        public float ChangeY;            // Pending: start signalling here. Signalling: start moving here. Moving: Y the move began.
+        public float FromX;
+        public TurnSignal Signal;
     }
+
+    public enum LaneChange { None, Pending, Signalling, Moving }
 
     private readonly List<ActiveObstacle> activeObstacles = new List<ActiveObstacle>();
     public IReadOnlyList<ActiveObstacle> ActiveObstacles => activeObstacles;
@@ -118,6 +131,8 @@ public class Spawner : MonoBehaviour
 
         CullObstacles();
 
+        if (useVariety) UpdateTraffic();
+
     }
 
     private readonly System.Random patternRandom = new System.Random();
@@ -134,16 +149,28 @@ public class Spawner : MonoBehaviour
             kind = TinyRoadTrip.Gameplay.Core.TrafficPatterns.Pick(difficulty.Level(timeAlive), patternRandom.NextDouble());
 
         int rows = TinyRoadTrip.Gameplay.Core.TrafficPatterns.Build(kind, lanePositions.Length, patternRandom, patternSlots);
+        bool single = kind == TinyRoadTrip.Gameplay.Core.TrafficPatternKind.Single;
         foreach (var slot in patternSlots)
-            SpawnObstacle(slot.Lane, slot.Row * patternRowGap);
+            SpawnObstacle(slot.Lane, slot.Row * patternRowGap, single);
         return Mathf.Max(1, rows);
     }
 
-    void SpawnObstacle(int lane, float heightAboveSpawn)
+    // single: a lone car (not part of a pattern), which may get its own speed or change lane.
+    void SpawnObstacle(int lane, float heightAboveSpawn, bool single)
     {
+        float level = difficulty.Level(timeAlive);
+        float speedFactor = 1f;
+        bool changesLane = false;
+        if (useVariety && single)
+        {
+            speedFactor = variety.RollSpeedFactor(level, patternRandom.NextDouble(), patternRandom.NextDouble());
+            changesLane = lanePositions.Length > 1 && variety.RollLaneChange(level, patternRandom.NextDouble());
+        }
+        float speed = _obstacleSpeed * speedFactor;
+
         int randomSpriteIndex = Random.Range(0, obstacleSprites.Count);
         Vector3 spawnPosition = lanePositions[lane].position + new Vector3(0f, heightAboveSpawn, 0f);
-        Vector2 velocity = new Vector2(0,-_obstacleSpeed * SpeedMultiplier);
+        Vector2 velocity = new Vector2(0,-speed * SpeedMultiplier);
 
         GameObject obs;
         bool pooled = ObjectSpawner.spawnerInstance != null;
@@ -182,14 +209,23 @@ public class Spawner : MonoBehaviour
         if (pooled && playerCollider != null && col != null)
             Physics2D.IgnoreCollision(playerCollider, col, false);
 
+        TurnSignal signal = obs.GetComponent<TurnSignal>();
+        if (signal != null) signal.Off(); // a reused car may have been blinking
+        else if (changesLane) signal = obs.AddComponent<TurnSignal>();
+
         activeObstacles.Add(new ActiveObstacle
         {
             GameObject = obs,
             Body = rb,
             Collider = col,
-            BaseSpeed = _obstacleSpeed,
+            BaseSpeed = speed,
             PreviousY = obs.transform.position.y,
             Pooled = pooled,
+            Lane = lane,
+            Varied = speedFactor != 1f,
+            Change = changesLane ? LaneChange.Pending : LaneChange.None,
+            ChangeY = variety.RollStartY(patternRandom.NextDouble()),
+            Signal = signal,
         });
     }
 
@@ -235,6 +271,116 @@ public class Spawner : MonoBehaviour
                 Release(o);
             }
         }
+    }
+
+    private readonly List<TinyRoadTrip.Gameplay.Core.LaneCar> laneCars = new List<TinyRoadTrip.Gameplay.Core.LaneCar>();
+    private static readonly ObstacleYComparer byY = new ObstacleYComparer();
+
+    private sealed class ObstacleYComparer : IComparer<ActiveObstacle>
+    {
+        public int Compare(ActiveObstacle a, ActiveObstacle b) => a.Body.position.y.CompareTo(b.Body.position.y);
+    }
+
+    // Speed variety and lane changes. Runs after CullObstacles, so every record has a live body.
+    private void UpdateTraffic()
+    {
+        // Lowest first: the car ahead of any car in its lane has a smaller index and is settled first.
+        activeObstacles.Sort(byY);
+        laneCars.Clear();
+        for (int i = 0; i < activeObstacles.Count; i++)
+            laneCars.Add(new TinyRoadTrip.Gameplay.Core.LaneCar(activeObstacles[i].Lane, activeObstacles[i].Body.position.y));
+
+        int laneCount = lanePositions.Length;
+        for (int i = 0; i < activeObstacles.Count; i++)
+        {
+            ActiveObstacle o = activeObstacles[i];
+            float y = laneCars[i].Y;
+            float speed = o.BaseSpeed;
+
+            if (o.Varied && variety.WouldCloseRow(laneCars, i, laneCount))
+            {
+                // Keep pace with the row instead of closing it.
+                int nearest = NearestOtherLane(i, variety.RowBand + variety.RowGuardMargin);
+                if (nearest >= 0) speed = activeObstacles[nearest].BaseSpeed;
+                o.Varied = false;
+            }
+
+            for (int j = i - 1; j >= 0; j--)
+            {
+                if (laneCars[j].Lane != o.Lane) continue;
+                speed = variety.FollowSpeed(speed, activeObstacles[j].BaseSpeed, y - laneCars[j].Y);
+                break;
+            }
+
+            if (speed != o.BaseSpeed)
+            {
+                o.BaseSpeed = speed;
+                o.Body.linearVelocity = new Vector2(0, -speed * SpeedMultiplier);
+            }
+
+            UpdateLaneChange(o, i, y, laneCount);
+        }
+    }
+
+    private void UpdateLaneChange(ActiveObstacle o, int index, float y, int laneCount)
+    {
+        switch (o.Change)
+        {
+            case LaneChange.Pending:
+                if (y > o.ChangeY) return;
+                o.TargetLane = TinyRoadTrip.Gameplay.Core.TrafficVariety.PickTargetLane(o.Lane, laneCount, patternRandom.NextDouble());
+                if (o.Signal == null || o.Collider == null || !variety.CanChangeLane(laneCars, index, o.TargetLane, laneCount))
+                {
+                    o.Change = LaneChange.None; // no room: this car stays in its lane
+                    return;
+                }
+                o.Change = LaneChange.Signalling;
+                o.ChangeY = y - variety.SignalDistance;
+                o.Signal.Show(o.TargetLane < o.Lane ? -1 : 1, o.Collider.bounds);
+                return;
+
+            case LaneChange.Signalling:
+                if (y > o.ChangeY) return;
+                if (!variety.CanChangeLane(laneCars, index, o.TargetLane, laneCount))
+                {
+                    o.Change = LaneChange.None;
+                    o.Signal.Off();
+                    return;
+                }
+                o.Change = LaneChange.Moving;
+                o.ChangeY = y;
+                o.FromX = o.Body.position.x;
+                o.Lane = o.TargetLane;
+                laneCars[index] = new TinyRoadTrip.Gameplay.Core.LaneCar(o.Lane, y);
+                return;
+
+            case LaneChange.Moving:
+            {
+                float t = variety.MoveDistance > 0f ? Mathf.Clamp01((o.ChangeY - y) / variety.MoveDistance) : 1f;
+                float x = Mathf.Lerp(o.FromX, lanePositions[o.TargetLane].position.x, Mathf.SmoothStep(0f, 1f, t));
+                o.Body.position = new Vector2(x, o.Body.position.y);
+                if (t >= 1f)
+                {
+                    o.Change = LaneChange.None;
+                    o.Signal.Off();
+                }
+                return;
+            }
+        }
+    }
+
+    // Index of the vertically closest car in another lane within band of car i, or -1.
+    private int NearestOtherLane(int i, float band)
+    {
+        int best = -1;
+        float bestDy = band;
+        for (int j = 0; j < laneCars.Count; j++)
+        {
+            if (j == i || laneCars[j].Lane == laneCars[i].Lane) continue;
+            float dy = Mathf.Abs(laneCars[j].Y - laneCars[i].Y);
+            if (dy < bestDy) { bestDy = dy; best = j; }
+        }
+        return best;
     }
 
     private void RemoveRecord(GameObject obs)
