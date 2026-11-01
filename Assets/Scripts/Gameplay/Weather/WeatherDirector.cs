@@ -173,7 +173,7 @@ namespace TinyRoadTrip.Gameplay
             var snowShape = snow.shape;
             snowShape.scale = new Vector3(halfWidth * 2f + 1f, 0.1f, 1f);
             var snowMain = snow.main;
-            snowMain.startLifetime = (halfHeight * 2f + 1f) / Mathf.Max(0.1f, snowFallSpeed * 0.8f); // slowest flake still reaches the bottom
+            snowMain.startLifetime = (halfHeight * 2f + 1f) / Mathf.Max(0.1f, snowFallSpeed * 0.6f); // slowest flake still reaches the bottom
 
             settled.transform.position = new Vector3(cam.x, cam.y, 0f);
             var settledShape = settled.shape;
@@ -318,16 +318,25 @@ namespace TinyRoadTrip.Gameplay
             var velocity = ps.velocityOverLifetime;
             velocity.enabled = true;
             velocity.space = ParticleSystemSimulationSpace.World;
-            velocity.x = new ParticleSystem.MinMaxCurve(-0.2f, 0.2f);
-            velocity.y = new ParticleSystem.MinMaxCurve(-snowFallSpeed * 1.2f, -snowFallSpeed * 0.8f);
+            // Wide per-flake spread in fall speed and drift, so flakes pass through the noise field at different
+            // rates and never sway in step.
+            velocity.x = new ParticleSystem.MinMaxCurve(-0.35f, 0.35f);
+            velocity.y = new ParticleSystem.MinMaxCurve(-snowFallSpeed * 1.4f, -snowFallSpeed * 0.6f);
             velocity.z = new ParticleSystem.MinMaxCurve(0f, 0f);
 
+            // Small-scale turbulence (about one flake-gap per feature) instead of one big slow wave,
+            // with a random sway strength per flake: mostly sideways, a little up and down.
             var noise = ps.noise;
             noise.enabled = true;
-            noise.strength = snowWobble;
-            noise.frequency = 0.4f;
-            noise.scrollSpeed = 0.3f;
-            noise.quality = ParticleSystemNoiseQuality.Low;
+            noise.separateAxes = true;
+            noise.strengthX = new ParticleSystem.MinMaxCurve(snowWobble * 0.3f, snowWobble * 1.2f);
+            noise.strengthY = new ParticleSystem.MinMaxCurve(0f, snowWobble * 0.3f);
+            noise.strengthZ = new ParticleSystem.MinMaxCurve(0f, 0f);
+            noise.frequency = 1.2f;
+            noise.octaveCount = 2;
+            noise.scrollSpeed = 0.15f;
+            noise.damping = true;
+            noise.quality = ParticleSystemNoiseQuality.Medium;
 
             var renderer = go.GetComponent<ParticleSystemRenderer>();
             renderer.renderMode = ParticleSystemRenderMode.Billboard;
