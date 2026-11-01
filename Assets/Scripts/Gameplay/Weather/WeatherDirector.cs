@@ -4,11 +4,12 @@ using UnityEngine;
 namespace TinyRoadTrip.Gameplay
 {
     // Runs the run's WeatherSchedule and draws it, all fading with the schedule's Visual level:
-    //   Rain:   blue tint, slanted streaks, splash rings on the road.
-    //   Snow:   pale tint, drifting flakes, flakes settling on the road.
-    //   Spring: rosy tint, fluttering petals.
-    //   Summer: warm tint, sun glare in the top corner, heat motes rising off the road.
-    //   Fall:   amber tint, spinning leaves, leaves settling on the road.
+    //   Rain:   dark blue grade, slanted streaks, splash rings on the road.
+    //   Snow:   pale cold grade, drifting flakes, flakes settling on the road.
+    //   Spring: vivid rosy grade, fluttering petals.
+    //   Summer: vivid golden grade, sun glare in the top corner, heat motes rising off the road.
+    //   Fall:   vivid amber grade, spinning leaves, leaves settling on the road.
+    // Each weather's screen grade (tint, saturation, contrast, brightness) is set in the inspector.
     // Every texture is generated here at startup, so the weathers add no art files to the build.
     // Gameplay scripts read SteerFactor / DistanceFactor; the world speed is set here. All follow Rule.
     // Visuals start during the warning, before any rule applies, so the player sees the weather coming.
@@ -22,9 +23,12 @@ namespace TinyRoadTrip.Gameplay
         [SerializeField] private BackgroundScroller road;
         [Tooltip("Optional. Snow and summer change the world speed through it (stacks with Slow-Time / Nitro).")]
         [SerializeField] private GameplaySpeedController speedController;
+        [Tooltip("Hidden/TinyRoadTrip/WeatherGrade. Referenced here so the build includes it.")]
+        [SerializeField] private Shader gradeShader;
 
         [Header("Rain")]
-        [SerializeField] private Color rainTint = new Color(0.12f, 0.18f, 0.32f, 0.32f);
+        [SerializeField] private ScreenGrade rainGrade = new ScreenGrade
+            { tint = new Color(0.55f, 0.68f, 1f), tintStrength = 0.45f, saturation = 0.75f, contrast = 1.05f, brightness = 0.8f };
         [SerializeField] private Color rainDropColor = new Color(0.75f, 0.85f, 1f, 0.45f);
         [SerializeField] private float rainEmissionRate = 140f;
         [SerializeField] private float rainSpeed = 16f;
@@ -38,7 +42,8 @@ namespace TinyRoadTrip.Gameplay
         [SerializeField] private float splashSize = 0.28f;
 
         [Header("Snow")]
-        [SerializeField] private Color snowTint = new Color(0.85f, 0.92f, 1f, 0.22f);
+        [SerializeField] private ScreenGrade snowGrade = new ScreenGrade
+            { tint = new Color(0.82f, 0.9f, 1f), tintStrength = 0.4f, saturation = 0.7f, contrast = 0.95f, brightness = 1.08f };
         [SerializeField] private Color snowflakeColor = new Color(1f, 1f, 1f, 0.9f);
         [SerializeField] private float snowEmissionRate = 55f;
         [SerializeField] private float snowFallSpeed = 1.6f;
@@ -48,7 +53,8 @@ namespace TinyRoadTrip.Gameplay
         [SerializeField] private float settledEmissionRate = 30f;
 
         [Header("Spring")]
-        [SerializeField] private Color springTint = new Color(1f, 0.55f, 0.8f, 0.16f);
+        [SerializeField] private ScreenGrade springGrade = new ScreenGrade
+            { tint = new Color(1f, 0.86f, 0.93f), tintStrength = 0.3f, saturation = 1.35f, contrast = 1.08f, brightness = 1.05f };
         [Tooltip("Each petal picks a random colour along this gradient.")]
         [SerializeField] private Gradient petalColors = DefaultPetalColors();
         [SerializeField] private float petalEmissionRate = 24f;
@@ -56,14 +62,16 @@ namespace TinyRoadTrip.Gameplay
         [SerializeField] private float petalWobble = 0.9f;
 
         [Header("Summer")]
-        [SerializeField] private Color summerTint = new Color(1f, 0.68f, 0.15f, 0.2f);
+        [SerializeField] private ScreenGrade summerGrade = new ScreenGrade
+            { tint = new Color(1f, 0.86f, 0.55f), tintStrength = 0.35f, saturation = 1.4f, contrast = 1.12f, brightness = 1.08f };
         [SerializeField] private Color glareColor = new Color(1f, 0.88f, 0.35f, 0.65f);
         [Tooltip("Each heat mote picks a random colour along this gradient.")]
         [SerializeField] private Gradient moteColors = DefaultMoteColors();
         [SerializeField] private float moteEmissionRate = 24f;
 
         [Header("Fall")]
-        [SerializeField] private Color fallTint = new Color(1f, 0.5f, 0.1f, 0.18f);
+        [SerializeField] private ScreenGrade fallGrade = new ScreenGrade
+            { tint = new Color(1f, 0.72f, 0.42f), tintStrength = 0.4f, saturation = 1.3f, contrast = 1.1f, brightness = 1f };
         [SerializeField] private Gradient leafColors = DefaultLeafColors();
         [SerializeField] private float leafEmissionRate = 14f;
         [SerializeField] private float leafFallSpeed = 1.5f;
@@ -72,7 +80,7 @@ namespace TinyRoadTrip.Gameplay
         [SerializeField] private float settledLeafEmissionRate = 10f;
 
         private readonly System.Random random = new System.Random();
-        private SpriteRenderer tint;
+        private WeatherScreenFilter screenFilter;
         private SpriteRenderer glare;
         private ParticleSystem rain;
         private ParticleSystem splashes;
@@ -102,7 +110,12 @@ namespace TinyRoadTrip.Gameplay
             Texture2D petal = CreatePetalTexture(16);
             Texture2D leaf = CreateLeafTexture(24);
 
-            tint = CreateTint();
+            if (targetCamera != null)
+            {
+                if (gradeShader == null) gradeShader = Shader.Find("Hidden/TinyRoadTrip/WeatherGrade");
+                screenFilter = targetCamera.gameObject.AddComponent<WeatherScreenFilter>();
+                screenFilter.Init(gradeShader);
+            }
             glare = CreateGlare(CreateGlowTexture(64));
             rain = CreateRain();
             splashes = CreateSplashes();
@@ -137,11 +150,9 @@ namespace TinyRoadTrip.Gameplay
             float summerLevel = Level(WeatherKind.Summer);
             float fallLevel = Level(WeatherKind.Fall);
 
-            // Only one weather at a time, so the tint is whichever one is active.
-            Color c = TintFor(schedule.Kind);
-            c.a *= schedule.Visual;
-            tint.color = c;
-            tint.enabled = c.a > 0.001f;
+            // Only one weather at a time, so the grade is whichever one is active, faded in by Visual.
+            if (screenFilter != null)
+                screenFilter.Set(ScreenGrade.Lerp(ScreenGrade.Neutral, GradeFor(schedule.Kind), schedule.Visual));
 
             // Summer glare breathes slowly so the sun feels alive.
             Color g = glareColor;
@@ -170,16 +181,16 @@ namespace TinyRoadTrip.Gameplay
             ApplyWorldSpeed();
         }
 
-        private Color TintFor(WeatherKind kind)
+        private ScreenGrade GradeFor(WeatherKind kind)
         {
             switch (kind)
             {
-                case WeatherKind.Rain: return rainTint;
-                case WeatherKind.Snow: return snowTint;
-                case WeatherKind.Spring: return springTint;
-                case WeatherKind.Summer: return summerTint;
-                case WeatherKind.Fall: return fallTint;
-                default: return Color.clear;
+                case WeatherKind.Rain: return rainGrade;
+                case WeatherKind.Snow: return snowGrade;
+                case WeatherKind.Spring: return springGrade;
+                case WeatherKind.Summer: return summerGrade;
+                case WeatherKind.Fall: return fallGrade;
+                default: return ScreenGrade.Neutral;
             }
         }
 
@@ -220,9 +231,6 @@ namespace TinyRoadTrip.Gameplay
             float halfWidth = halfHeight * targetCamera.aspect;
             Vector3 cam = targetCamera.transform.position;
 
-            tint.transform.position = new Vector3(cam.x, cam.y, 0f);
-            tint.transform.localScale = new Vector3(halfWidth * 2f + 1f, halfHeight * 2f + 1f, 1f);
-
             float glareSize = halfWidth * 2.2f;
             glare.transform.position = new Vector3(cam.x + halfWidth * 0.9f, cam.y + halfHeight * 0.95f, 0f);
             glare.transform.localScale = new Vector3(glareSize, glareSize, 1f);
@@ -259,18 +267,6 @@ namespace TinyRoadTrip.Gameplay
             main.startLifetime = (halfHeight * 2f + 1f) / Mathf.Max(0.1f, fallSpeed * 0.6f);
         }
 
-        private SpriteRenderer CreateTint()
-        {
-            var go = new GameObject("WeatherTint");
-            go.transform.SetParent(transform, false);
-            var sr = go.AddComponent<SpriteRenderer>();
-            Texture2D tex = Texture2D.whiteTexture;
-            sr.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), tex.width);
-            sr.sortingOrder = 5; // above road, cars and speed lines
-            sr.enabled = false;
-            return sr;
-        }
-
         // Soft sun glow in the top corner for summer.
         private SpriteRenderer CreateGlare(Texture2D glow)
         {
@@ -278,7 +274,7 @@ namespace TinyRoadTrip.Gameplay
             go.transform.SetParent(transform, false);
             var sr = go.AddComponent<SpriteRenderer>();
             sr.sprite = Sprite.Create(glow, new Rect(0, 0, glow.width, glow.height), new Vector2(0.5f, 0.5f), glow.width);
-            sr.sortingOrder = 6; // above the tint
+            sr.sortingOrder = 6; // above road, cars and speed lines
             sr.enabled = false;
             return sr;
         }
@@ -303,7 +299,7 @@ namespace TinyRoadTrip.Gameplay
             renderer.velocityScale = 0.05f;
             renderer.lengthScale = 1f;
             renderer.material = new Material(Shader.Find("Sprites/Default"));
-            renderer.sortingOrder = 6; // above the tint
+            renderer.sortingOrder = 6; // above road, cars and speed lines
 
             ps.Play();
             return ps;
@@ -328,7 +324,7 @@ namespace TinyRoadTrip.Gameplay
             sizeOverLifetime.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.EaseInOut(0f, 0.15f, 1f, 1f));
             SetFade(ps, new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(0.6f, 0.5f), new GradientAlphaKey(0f, 1f) });
 
-            SetRenderer(ps, CreateRingTexture(32), 1); // above road and cars (rain lands on car roofs too), below the tint
+            SetRenderer(ps, CreateRingTexture(32), 1); // above road and cars (rain lands on car roofs too)
             ps.Play();
             return ps;
         }
@@ -373,7 +369,7 @@ namespace TinyRoadTrip.Gameplay
                 rotation.z = new ParticleSystem.MinMaxCurve(-spin * Mathf.Deg2Rad, spin * Mathf.Deg2Rad);
             }
 
-            SetRenderer(ps, texture, 6); // above the tint
+            SetRenderer(ps, texture, 6); // above road, cars and speed lines
             ps.Play();
             return ps;
         }
@@ -395,7 +391,7 @@ namespace TinyRoadTrip.Gameplay
             SetVelocity(ps, new ParticleSystem.MinMaxCurve(0f, 0f), new ParticleSystem.MinMaxCurve(0f, 0f));
             SetFade(ps, new[] { new GradientAlphaKey(0f, 0f), new GradientAlphaKey(0.8f, 0.1f), new GradientAlphaKey(0.6f, 0.6f), new GradientAlphaKey(0f, 1f) });
 
-            SetRenderer(ps, texture, 1); // on the road and car roofs, below the tint
+            SetRenderer(ps, texture, 1); // on the road and car roofs
             ps.Play();
             return ps;
         }
@@ -484,11 +480,8 @@ namespace TinyRoadTrip.Gameplay
         }
 
         private static Gradient DefaultPetalColors() => Palette(0.95f,
-            new Color(1f, 0.25f, 0.6f),    // hot pink
-            new Color(1f, 0.6f, 0.8f),     // pink
-            new Color(1f, 1f, 1f),         // white
-            new Color(0.75f, 0.5f, 1f),    // lilac
-            new Color(1f, 0.85f, 0.2f));   // buttercup yellow
+            new Color(1f, 0.72f, 0.82f),   // soft pink
+            new Color(1f, 0.95f, 0.97f));  // blush white
 
         private static Gradient DefaultMoteColors() => Palette(0.7f,
             new Color(1f, 1f, 0.75f),      // pale gold
