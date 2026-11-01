@@ -23,6 +23,9 @@ public class Spawner : MonoBehaviour
     [Tooltip("Single cars get their own speed and some change lane (with a turn-signal blink) as difficulty rises.")]
     [SerializeField] private bool useVariety = true;
     [SerializeField] private TinyRoadTrip.Gameplay.Core.TrafficVariety variety = new TinyRoadTrip.Gameplay.Core.TrafficVariety();
+    [Tooltip("Minimum window between cars, in player lengths: any two cars are side by side in a row or at least this " +
+             "far apart bumper to bumper. Eases from the easy factor to the hard factor as difficulty rises.")]
+    [SerializeField] private TinyRoadTrip.Gameplay.Core.TrafficGaps gaps = new TinyRoadTrip.Gameplay.Core.TrafficGaps();
 
     [Header("Screen Adaptation")]
     [Tooltip("Aspect-ratio lane formula from the Difficulty-Setup branch. Off by default: ResponsiveCamera already " +
@@ -39,8 +42,8 @@ public class Spawner : MonoBehaviour
     [SerializeField] private float despawnBelowY = -12f;
     [Tooltip("Safety net: non-pooled obstacles are destroyed after this many seconds even if they never leave the screen.")]
     [SerializeField] private float maxObstacleLifetime = 60f;
-    [Tooltip("Optional. Re-enables collisions between the player and a pooled car when it is reused " +
-             "(the shield's invulnerability window disables them per car).")]
+    [Tooltip("Re-enables collisions between the player and a pooled car when it is reused (the shield's " +
+             "invulnerability window disables them per car). Its height is the player length the gaps are based on.")]
     [SerializeField] private Collider2D playerCollider;
 
     // Live obstacle record shared with near-miss detection, collectible placement and the shield.
@@ -50,6 +53,7 @@ public class Spawner : MonoBehaviour
         public Rigidbody2D Body;
         public Collider2D Collider;
         public float BaseSpeed;
+        public float Length;             // collider height, for the gap rule
         public float PreviousY;
         public bool NearMissResolved;
         public bool WasHit;
@@ -77,6 +81,11 @@ public class Spawner : MonoBehaviour
 
     private float SpeedMultiplier => speedController != null ? speedController.Multiplier : 1f;
 
+    private float carLength = 1.5f;   // from the obstacle prefab's collider, for cars about to spawn
+    private float PlayerLength => playerCollider != null ? playerCollider.bounds.size.y : carLength;
+    private float ClearGap => gaps.MinClearGap(PlayerLength, difficulty.Level(timeAlive));
+    private float lastPatternHeight;  // how far above the spawn line the last pattern's top row started
+
     private void Awake()
     {
         if (!adaptLanesToAspect) return;
@@ -91,6 +100,7 @@ public class Spawner : MonoBehaviour
 
     private void Start()
     {
+        carLength = PrefabCarLength();
 
         ResetFactors();
 
@@ -121,9 +131,9 @@ public class Spawner : MonoBehaviour
 
         if (timer>= _obstacleSpawnTime)
         {
-            int rows = SpawnPattern();
-            // A multi-row pattern is taller than one car; hold the next spawn until its last row has entered.
-            timer = _obstacleSpeed > 0f ? -(rows - 1) * patternRowGap / _obstacleSpeed : 0f;
+            SpawnPattern();
+            // A multi-row or lifted pattern starts higher up; hold the next spawn until its top row has entered.
+            timer = _obstacleSpeed > 0f ? -lastPatternHeight / _obstacleSpeed : 0f;
 
         }
 
@@ -137,10 +147,13 @@ public class Spawner : MonoBehaviour
 
     private readonly System.Random patternRandom = new System.Random();
     private readonly List<TinyRoadTrip.Gameplay.Core.CarSlot> patternSlots = new List<TinyRoadTrip.Gameplay.Core.CarSlot>();
+    private readonly List<TinyRoadTrip.Gameplay.Core.GapCar> gapExisting = new List<TinyRoadTrip.Gameplay.Core.GapCar>();
+    private readonly List<TinyRoadTrip.Gameplay.Core.GapCar> gapIncoming = new List<TinyRoadTrip.Gameplay.Core.GapCar>();
 
     // Returns the number of rows spawned.
     int SpawnPattern()
     {
+        lastPatternHeight = 0f;
         if (lanePositions.Length == 0 || obstacleSprites.Count == 0)
             return 1;
 
@@ -150,9 +163,37 @@ public class Spawner : MonoBehaviour
 
         int rows = TinyRoadTrip.Gameplay.Core.TrafficPatterns.Build(kind, lanePositions.Length, patternRandom, patternSlots);
         bool single = kind == TinyRoadTrip.Gameplay.Core.TrafficPatternKind.Single;
+
+        // Rows of a pattern are a full window apart, and the whole pattern is raised above the spawn line until
+        // every car is side by side with, or a window away from, the cars already on the road.
+        float clear = ClearGap;
+        float rowGap = Mathf.Max(patternRowGap, TinyRoadTrip.Gameplay.Core.TrafficGaps.CentreDistance(carLength, carLength, clear));
+        gapIncoming.Clear();
         foreach (var slot in patternSlots)
-            SpawnObstacle(slot.Lane, slot.Row * patternRowGap, single);
+            gapIncoming.Add(new TinyRoadTrip.Gameplay.Core.GapCar(slot.Lane, lanePositions[slot.Lane].position.y + slot.Row * rowGap, carLength));
+        gapExisting.Clear();
+        foreach (ActiveObstacle o in activeObstacles)
+            if (o.Body != null) gapExisting.Add(new TinyRoadTrip.Gameplay.Core.GapCar(o.Lane, o.Body.position.y, o.Length));
+        float lift = gaps.Lift(gapExisting, gapIncoming, clear, lanePositions.Length);
+
+        foreach (var slot in patternSlots)
+            SpawnObstacle(slot.Lane, slot.Row * rowGap + lift, single);
+        lastPatternHeight = (Mathf.Max(1, rows) - 1) * rowGap + lift;
         return Mathf.Max(1, rows);
+    }
+
+    // Height of the obstacle prefab's collider, the length of a car that is about to spawn.
+    private float PrefabCarLength()
+    {
+        if (obstaclePrefab == null) return carLength;
+        float scaleY = Mathf.Abs(obstaclePrefab.transform.localScale.y);
+        var box = obstaclePrefab.GetComponent<BoxCollider2D>();
+        if (box != null) return box.size.y * scaleY;
+        var capsule = obstaclePrefab.GetComponent<CapsuleCollider2D>();
+        if (capsule != null) return capsule.size.y * scaleY;
+        var circle = obstaclePrefab.GetComponent<CircleCollider2D>();
+        if (circle != null) return circle.radius * 2f * scaleY;
+        return carLength;
     }
 
     // single: a lone car (not part of a pattern), which may get its own speed or change lane.
@@ -219,6 +260,7 @@ public class Spawner : MonoBehaviour
             Body = rb,
             Collider = col,
             BaseSpeed = speed,
+            Length = col != null ? col.bounds.size.y : carLength,
             PreviousY = obs.transform.position.y,
             Pooled = pooled,
             Lane = lane,
@@ -291,6 +333,7 @@ public class Spawner : MonoBehaviour
             laneCars.Add(new TinyRoadTrip.Gameplay.Core.LaneCar(activeObstacles[i].Lane, activeObstacles[i].Body.position.y));
 
         int laneCount = lanePositions.Length;
+        float clear = ClearGap;
         for (int i = 0; i < activeObstacles.Count; i++)
         {
             ActiveObstacle o = activeObstacles[i];
@@ -305,11 +348,15 @@ public class Spawner : MonoBehaviour
                 o.Varied = false;
             }
 
+            // Never catch up on a car ahead (lower on screen) to closer than a clear window: in the same lane
+            // that is following, in another lane it keeps the window the player needs between the two.
             for (int j = i - 1; j >= 0; j--)
             {
-                if (laneCars[j].Lane != o.Lane) continue;
-                speed = variety.FollowSpeed(speed, activeObstacles[j].BaseSpeed, y - laneCars[j].Y);
-                break;
+                ActiveObstacle ahead = activeObstacles[j];
+                float dy = y - laneCars[j].Y;
+                if (laneCars[j].Lane != o.Lane && dy <= gaps.AlignTolerance) continue; // side by side in a row
+                float need = TinyRoadTrip.Gameplay.Core.TrafficGaps.CentreDistance(o.Length, ahead.Length, clear);
+                speed = TinyRoadTrip.Gameplay.Core.TrafficVariety.FollowSpeed(speed, ahead.BaseSpeed, dy, need);
             }
 
             if (speed != o.BaseSpeed)
@@ -329,7 +376,7 @@ public class Spawner : MonoBehaviour
             case LaneChange.Pending:
                 if (y > o.ChangeY) return;
                 o.TargetLane = TinyRoadTrip.Gameplay.Core.TrafficVariety.PickTargetLane(o.Lane, laneCount, patternRandom.NextDouble());
-                if (o.Signal == null || o.Collider == null || !variety.CanChangeLane(laneCars, index, o.TargetLane, laneCount))
+                if (o.Signal == null || o.Collider == null || !variety.CanChangeLane(laneCars, index, o.TargetLane, laneCount, LaneChangeClearance(o)))
                 {
                     o.Change = LaneChange.None; // no room: this car stays in its lane
                     return;
@@ -341,7 +388,7 @@ public class Spawner : MonoBehaviour
 
             case LaneChange.Signalling:
                 if (y > o.ChangeY) return;
-                if (!variety.CanChangeLane(laneCars, index, o.TargetLane, laneCount))
+                if (!variety.CanChangeLane(laneCars, index, o.TargetLane, laneCount, LaneChangeClearance(o)))
                 {
                     o.Change = LaneChange.None;
                     o.Signal.Off();
@@ -367,6 +414,12 @@ public class Spawner : MonoBehaviour
                 return;
             }
         }
+    }
+
+    // Centre-to-centre room a lane-changer needs in its target lane: a clear window on either side.
+    private float LaneChangeClearance(ActiveObstacle o)
+    {
+        return TinyRoadTrip.Gameplay.Core.TrafficGaps.CentreDistance(o.Length, carLength, ClearGap);
     }
 
     // Index of the vertically closest car in another lane within band of car i, or -1.
