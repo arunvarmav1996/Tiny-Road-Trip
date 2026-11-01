@@ -69,7 +69,13 @@ namespace TinyRoadTrip.Gameplay.Core
         // Speed a car should drive at given the car ahead in its lane (gap = centre-to-centre distance).
         public float FollowSpeed(float speed, float aheadSpeed, float gap)
         {
-            return gap <= FollowGap && speed > aheadSpeed ? aheadSpeed : speed;
+            return FollowSpeed(speed, aheadSpeed, gap, FollowGap);
+        }
+
+        // Same, with the follow distance given by the caller (e.g. from TrafficGaps).
+        public static float FollowSpeed(float speed, float aheadSpeed, float gap, float followGap)
+        {
+            return gap <= followGap && speed > aheadSpeed ? aheadSpeed : speed;
         }
 
         // Number of distinct lanes occupied by cars within band of y (skip = index to ignore, -1 for none),
@@ -95,9 +101,15 @@ namespace TinyRoadTrip.Gameplay.Core
         // True if the car at index self may move into targetLane right now.
         public bool CanChangeLane(IReadOnlyList<LaneCar> cars, int self, int targetLane, int laneCount)
         {
+            return CanChangeLane(cars, self, targetLane, laneCount, LaneClearance);
+        }
+
+        // Same, with the clearance (centre-to-centre) given by the caller (e.g. from TrafficGaps).
+        public bool CanChangeLane(IReadOnlyList<LaneCar> cars, int self, int targetLane, int laneCount, float clearance)
+        {
             float y = cars[self].Y;
             for (int i = 0; i < cars.Count; i++)
-                if (i != self && cars[i].Lane == targetLane && Math.Abs(cars[i].Y - y) < LaneClearance) return false;
+                if (i != self && cars[i].Lane == targetLane && Math.Abs(cars[i].Y - y) < clearance) return false;
             return LeavesWayThrough(CountBlockedLanes(cars, self, y, RowBand, targetLane), laneCount);
         }
 
