@@ -4,6 +4,7 @@ namespace TinyRoadTrip.Gameplay.Core
     {
         SlowTime = 0,
         Nitro = 1,
+        Weather = 2,
     }
 
     // Combined world-speed multiplier = product of all active modifiers (Slow-Time 0.5 x Nitro 1.5 = 0.75).

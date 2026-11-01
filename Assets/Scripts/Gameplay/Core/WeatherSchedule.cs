@@ -6,6 +6,7 @@ namespace TinyRoadTrip.Gameplay.Core
     {
         Clear = 0,
         Rain = 1,
+        Snow = 2,
     }
 
     // Weather over one run: clear spells alternate with weather spells picked at random by weight
@@ -28,6 +29,7 @@ namespace TinyRoadTrip.Gameplay.Core
         public float WarningVisual = 0.35f;   // visual level reached by the end of the warning
 
         public float RainWeight = 1f;
+        public float SnowWeight = 1f;
 
         public enum Phase { Clear, Warning, FadeIn, Active, FadeOut }
 
@@ -133,6 +135,7 @@ namespace TinyRoadTrip.Gameplay.Core
         {
             weights[(int)WeatherKind.Clear] = 0f;
             weights[(int)WeatherKind.Rain] = RainWeight;
+            weights[(int)WeatherKind.Snow] = SnowWeight;
 
             float others = 0f;
             for (int i = 1; i < weights.Length; i++)
@@ -153,16 +156,23 @@ namespace TinyRoadTrip.Gameplay.Core
     }
 
     // Gameplay effect of each weather, scaled by WeatherSchedule.Rule.
+    //   Rain: slippery steering, small score bonus.
+    //   Snow: the whole world slows (careful driving) but steering is icier still; bigger score bonus,
+    //         so the net distance per second is still a little higher than in clear weather.
     public static class WeatherRules
     {
         public const float RainSteerFactor = 0.55f;    // lane changes at 55% speed: the road is slippery
         public const float RainDistanceBonus = 1.25f;  // distance (score) counts 25% more while it rains
+        public const float SnowSteerFactor = 0.4f;
+        public const float SnowWorldSpeed = 0.8f;      // road, cars and coins at 80% speed
+        public const float SnowDistanceBonus = 1.4f;
 
         public static float SteerFactor(WeatherKind kind, float rule)
         {
             switch (kind)
             {
                 case WeatherKind.Rain: return Lerp(1f, RainSteerFactor, rule);
+                case WeatherKind.Snow: return Lerp(1f, SnowSteerFactor, rule);
                 default: return 1f;
             }
         }
@@ -172,6 +182,17 @@ namespace TinyRoadTrip.Gameplay.Core
             switch (kind)
             {
                 case WeatherKind.Rain: return Lerp(1f, RainDistanceBonus, rule);
+                case WeatherKind.Snow: return Lerp(1f, SnowDistanceBonus, rule);
+                default: return 1f;
+            }
+        }
+
+        // Multiplier for the world speed (GameplaySpeedController), on top of Slow-Time / Nitro.
+        public static float WorldSpeedFactor(WeatherKind kind, float rule)
+        {
+            switch (kind)
+            {
+                case WeatherKind.Snow: return Lerp(1f, SnowWorldSpeed, rule);
                 default: return 1f;
             }
         }

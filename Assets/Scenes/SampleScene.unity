@@ -5394,9 +5394,11 @@ MonoBehaviour:
     MaxCalmWait: 15
     WarningVisual: 0.35
     RainWeight: 1
+    SnowWeight: 1
   spawner: {fileID: 153388343}
   targetCamera: {fileID: 519420031}
   road: {fileID: 565693278}
+  speedController: {fileID: 1917952524}
   rainTint: {r: 0.12, g: 0.18, b: 0.32, a: 0.32}
   rainDropColor: {r: 0.75, g: 0.85, b: 1, a: 0.45}
   rainEmissionRate: 140
@@ -5405,6 +5407,12 @@ MonoBehaviour:
   splashColor: {r: 0.8, g: 0.9, b: 1, a: 0.55}
   splashEmissionRate: 45
   splashSize: 0.28
+  snowTint: {r: 0.85, g: 0.92, b: 1, a: 0.22}
+  snowflakeColor: {r: 1, g: 1, b: 1, a: 0.9}
+  snowEmissionRate: 55
+  snowFallSpeed: 1.6
+  snowWobble: 0.6
+  settledEmissionRate: 30
 --- !u!4 &1300829330
 Transform:
   m_ObjectHideFlags: 0

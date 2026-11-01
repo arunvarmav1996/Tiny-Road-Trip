@@ -507,7 +507,8 @@ namespace TinyRoadTrip.Gameplay.Tests
         private static WeatherSchedule Make()
         {
             return new WeatherSchedule { WarmUp = 10f, MinClear = 5f, MaxClear = 5f, MinDuration = 20f, MaxDuration = 20f,
-                                         WarningTime = 2f, FadeTime = 4f, MaxCalmWait = 8f, WarningVisual = 0.4f };
+                                         WarningTime = 2f, FadeTime = 4f, MaxCalmWait = 8f, WarningVisual = 0.4f,
+                                         SnowWeight = 0f }; // rain only unless a test turns snow on
         }
 
         private static void Run(WeatherSchedule w, float seconds, bool calm, System.Random rng)
@@ -580,6 +581,7 @@ namespace TinyRoadTrip.Gameplay.Tests
         {
             var w = Make();
             w.RainWeight = 0f;
+            w.SnowWeight = 0f;
             Run(w, 60f, true, new System.Random(1));
             Assert.AreEqual(WeatherKind.Clear, w.Kind);
         }
@@ -607,6 +609,56 @@ namespace TinyRoadTrip.Gameplay.Tests
             Assert.AreEqual(WeatherKind.Rain, w.Kind);
             Run(w, 2f + 4f + 1f, false, rng);
             Assert.AreEqual(WeatherSchedule.Phase.Active, w.State);
+        }
+
+        [Test]
+        public void SameWeatherNeverTwiceInARow()
+        {
+            var w = Make();
+            w.SnowWeight = 1f;
+            var rng = new System.Random(42);
+            var spells = new System.Collections.Generic.List<WeatherKind>();
+            WeatherKind current = WeatherKind.Clear;
+            for (int i = 0; i < 20000; i++)
+            {
+                w.Tick(0.1f, true, rng);
+                if (w.Kind != WeatherKind.Clear && w.Kind != current) spells.Add(w.Kind);
+                current = w.Kind;
+            }
+            Assert.Greater(spells.Count, 20);
+            Assert.Contains(WeatherKind.Rain, spells);
+            Assert.Contains(WeatherKind.Snow, spells);
+            for (int i = 1; i < spells.Count; i++)
+                Assert.AreNotEqual(spells[i - 1], spells[i], "spell " + i);
+        }
+
+        [Test]
+        public void OnlyOneWeightedWeather_RepeatsIt()
+        {
+            var w = Make();
+            w.RainWeight = 0f;
+            w.SnowWeight = 1f;
+            var rng = new System.Random(3);
+            Run(w, 200f, true, rng);
+            Assert.AreNotEqual(WeatherKind.Rain, w.Kind);
+            bool sawSnow = false;
+            for (int i = 0; i < 2000; i++)
+            {
+                w.Tick(0.1f, true, rng);
+                Assert.AreNotEqual(WeatherKind.Rain, w.Kind);
+                sawSnow |= w.Kind == WeatherKind.Snow;
+            }
+            Assert.IsTrue(sawSnow);
+        }
+
+        [Test]
+        public void SnowRules_SlowTheWorldButPayMore()
+        {
+            Assert.AreEqual(WeatherRules.SnowWorldSpeed, WeatherRules.WorldSpeedFactor(WeatherKind.Snow, 1f), 1e-5f);
+            Assert.AreEqual(1f, WeatherRules.WorldSpeedFactor(WeatherKind.Rain, 1f));
+            Assert.AreEqual(1f, WeatherRules.WorldSpeedFactor(WeatherKind.Snow, 0f));
+            Assert.Less(WeatherRules.SteerFactor(WeatherKind.Snow, 1f), WeatherRules.SteerFactor(WeatherKind.Rain, 1f), "ice is worse than rain");
+            Assert.Greater(WeatherRules.SnowWorldSpeed * WeatherRules.SnowDistanceBonus, 1f, "snow still pays off");
         }
 
         [Test]
