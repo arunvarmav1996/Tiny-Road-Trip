@@ -690,6 +690,21 @@ MonoBehaviour:
     CalmIntervalMultiplier: 1.9
   usePatterns: 1
   patternRowGap: 2.6
+  useVariety: 1
+  variety:
+    VarietyUnlockLevel: 0.1
+    MaxVariedChance: 0.5
+    SpeedSpread: 0.2
+    LaneChangeUnlockLevel: 0.3
+    MaxLaneChangeChance: 0.3
+    LaneChangeStartYMax: 3.4
+    LaneChangeStartYMin: 2.6
+    SignalDistance: 2.4
+    MoveDistance: 1.3
+    LaneClearance: 2.4
+    FollowGap: 1.7
+    RowBand: 1.4
+    RowGuardMargin: 0.6
   adaptLanesToAspect: 0
   speedController: {fileID: 1917952524}
   despawnBelowY: -12
@@ -2058,6 +2073,7 @@ MonoBehaviour:
   numLanes: 5
   dashSpeed: 2
   adaptLaneDistanceToAspect: 0
+  weather: {fileID: 1300829329}
   minSwipeDistance: 60
 --- !u!50 &395117825
 Rigidbody2D:
@@ -5338,6 +5354,68 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2b338f28bbedbf34d94a9dfe3e565847, type: 3}
+--- !u!1 &1300829328
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1300829330}
+  - component: {fileID: 1300829329}
+  m_Layer: 0
+  m_Name: Weather
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1300829329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1300829328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f3a9489f88240a8a9d741ecc62b7567, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TinyRoadTrip.Gameplay.WeatherDirector
+  schedule:
+    WarmUp: 30
+    MinClear: 15
+    MaxClear: 30
+    MinDuration: 25
+    MaxDuration: 40
+    WarningTime: 3
+    FadeTime: 4
+    MaxCalmWait: 15
+    WarningVisual: 0.35
+    RainWeight: 1
+  spawner: {fileID: 153388343}
+  targetCamera: {fileID: 519420031}
+  rainTint: {r: 0.12, g: 0.18, b: 0.32, a: 0.32}
+  rainDropColor: {r: 0.75, g: 0.85, b: 1, a: 0.45}
+  rainEmissionRate: 140
+  rainSpeed: 16
+  rainSlant: -2.5
+--- !u!4 &1300829330
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1300829328}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1307068578
 GameObject:
   m_ObjectHideFlags: 0
@@ -8774,6 +8852,7 @@ MonoBehaviour:
   speedController: {fileID: 1917952524}
   comboManager: {fileID: 1917952526}
   coinManager: {fileID: 1917952532}
+  weather: {fileID: 1300829329}
   distanceText: {fileID: 1141399023}
   unitSuffix: <size=45%> km</size>
   metersPerSecond: 33.333332
@@ -9598,3 +9677,4 @@ SceneRoots:
   - {fileID: 1473656733}
   - {fileID: 1601899220}
   - {fileID: 286848627}
+  - {fileID: 1300829330}
