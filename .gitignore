@@ -105,3 +105,7 @@ InitTestScene*.unity*
 # Unity crash-recovery scenes (local only)
 /[Aa]ssets/_Recovery/
 /[Aa]ssets/_Recovery.meta
+
+# Written by the BuildStamp editor step for each player build, deleted afterwards
+/[Aa]ssets/BuildStamp/
+/[Aa]ssets/BuildStamp.meta
