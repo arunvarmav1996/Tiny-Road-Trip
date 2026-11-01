@@ -48,21 +48,22 @@ namespace TinyRoadTrip.Gameplay
         [SerializeField] private float settledEmissionRate = 30f;
 
         [Header("Spring")]
-        [SerializeField] private Color springTint = new Color(1f, 0.82f, 0.9f, 0.12f);
-        [SerializeField] private Color petalColorA = new Color(1f, 0.72f, 0.82f, 0.95f);
-        [SerializeField] private Color petalColorB = new Color(1f, 0.95f, 0.97f, 0.95f);
-        [SerializeField] private float petalEmissionRate = 18f;
+        [SerializeField] private Color springTint = new Color(1f, 0.55f, 0.8f, 0.16f);
+        [Tooltip("Each petal picks a random colour along this gradient.")]
+        [SerializeField] private Gradient petalColors = DefaultPetalColors();
+        [SerializeField] private float petalEmissionRate = 24f;
         [SerializeField] private float petalFallSpeed = 1.1f;
         [SerializeField] private float petalWobble = 0.9f;
 
         [Header("Summer")]
-        [SerializeField] private Color summerTint = new Color(1f, 0.8f, 0.45f, 0.13f);
-        [SerializeField] private Color glareColor = new Color(1f, 0.93f, 0.7f, 0.45f);
-        [SerializeField] private Color moteColor = new Color(1f, 0.95f, 0.8f, 0.5f);
-        [SerializeField] private float moteEmissionRate = 14f;
+        [SerializeField] private Color summerTint = new Color(1f, 0.68f, 0.15f, 0.2f);
+        [SerializeField] private Color glareColor = new Color(1f, 0.88f, 0.35f, 0.65f);
+        [Tooltip("Each heat mote picks a random colour along this gradient.")]
+        [SerializeField] private Gradient moteColors = DefaultMoteColors();
+        [SerializeField] private float moteEmissionRate = 24f;
 
         [Header("Fall")]
-        [SerializeField] private Color fallTint = new Color(1f, 0.6f, 0.25f, 0.13f);
+        [SerializeField] private Color fallTint = new Color(1f, 0.5f, 0.1f, 0.18f);
         [SerializeField] private Gradient leafColors = DefaultLeafColors();
         [SerializeField] private float leafEmissionRate = 14f;
         [SerializeField] private float leafFallSpeed = 1.5f;
@@ -107,9 +108,9 @@ namespace TinyRoadTrip.Gameplay
             splashes = CreateSplashes();
             snow = CreateFalling("WeatherSnow", dot, new ParticleSystem.MinMaxGradient(snowflakeColor), 0.06f, 0.16f, snowFallSpeed, snowWobble, 0f, 400);
             settledSnow = CreateSettled("WeatherSettledSnow", dot, new ParticleSystem.MinMaxGradient(snowflakeColor), 0.05f, 0.12f, 1.2f, 2f, 120);
-            petals = CreateFalling("WeatherPetals", petal, new ParticleSystem.MinMaxGradient(petalColorA, petalColorB), 0.1f, 0.18f, petalFallSpeed, petalWobble, 160f, 150);
+            petals = CreateFalling("WeatherPetals", petal, RandomFrom(petalColors), 0.1f, 0.18f, petalFallSpeed, petalWobble, 160f, 150);
             motes = CreateMotes(dot);
-            var leafGradient = new ParticleSystem.MinMaxGradient(leafColors) { mode = ParticleSystemGradientMode.RandomColor };
+            var leafGradient = RandomFrom(leafColors);
             leaves = CreateFalling("WeatherLeaves", leaf, leafGradient, 0.16f, 0.28f, leafFallSpeed, leafWobble, 200f, 120);
             settledLeaves = CreateSettled("WeatherSettledLeaves", leaf, leafGradient, 0.16f, 0.26f, 2f, 3f, 80);
             Apply();
@@ -406,7 +407,7 @@ namespace TinyRoadTrip.Gameplay
             var main = ps.main;
             main.startLifetime = new ParticleSystem.MinMaxCurve(2.5f, 4.5f);
             main.startSize = new ParticleSystem.MinMaxCurve(0.03f, 0.07f);
-            main.startColor = moteColor;
+            main.startColor = RandomFrom(moteColors);
 
             var shape = ps.shape;
             shape.shapeType = ParticleSystemShapeType.Box;
@@ -468,20 +469,37 @@ namespace TinyRoadTrip.Gameplay
             renderer.sortingOrder = sortingOrder;
         }
 
-        private static Gradient DefaultLeafColors()
+        // Each particle takes one random colour from the gradient (not a fade along its life).
+        private static ParticleSystem.MinMaxGradient RandomFrom(Gradient gradient) =>
+            new ParticleSystem.MinMaxGradient(gradient) { mode = ParticleSystemGradientMode.RandomColor };
+
+        private static Gradient Palette(float alpha, params Color[] colors)
         {
+            var keys = new GradientColorKey[colors.Length];
+            for (int i = 0; i < colors.Length; i++)
+                keys[i] = new GradientColorKey(colors[i], colors.Length == 1 ? 0f : i / (float)(colors.Length - 1));
             var gradient = new Gradient();
-            gradient.SetKeys(
-                new[]
-                {
-                    new GradientColorKey(new Color(0.85f, 0.25f, 0.1f), 0f),   // red
-                    new GradientColorKey(new Color(0.95f, 0.5f, 0.12f), 0.35f), // orange
-                    new GradientColorKey(new Color(0.98f, 0.78f, 0.2f), 0.7f),  // yellow
-                    new GradientColorKey(new Color(0.55f, 0.32f, 0.15f), 1f),   // brown
-                },
-                new[] { new GradientAlphaKey(0.95f, 0f), new GradientAlphaKey(0.95f, 1f) });
+            gradient.SetKeys(keys, new[] { new GradientAlphaKey(alpha, 0f), new GradientAlphaKey(alpha, 1f) });
             return gradient;
         }
+
+        private static Gradient DefaultPetalColors() => Palette(0.95f,
+            new Color(1f, 0.25f, 0.6f),    // hot pink
+            new Color(1f, 0.6f, 0.8f),     // pink
+            new Color(1f, 1f, 1f),         // white
+            new Color(0.75f, 0.5f, 1f),    // lilac
+            new Color(1f, 0.85f, 0.2f));   // buttercup yellow
+
+        private static Gradient DefaultMoteColors() => Palette(0.7f,
+            new Color(1f, 1f, 0.75f),      // pale gold
+            new Color(1f, 0.85f, 0.3f),    // gold
+            new Color(1f, 0.6f, 0.15f));   // orange
+
+        private static Gradient DefaultLeafColors() => Palette(0.95f,
+            new Color(0.9f, 0.12f, 0.08f), // red
+            new Color(1f, 0.4f, 0.05f),    // red-orange
+            new Color(1f, 0.6f, 0.1f),     // orange
+            new Color(1f, 0.85f, 0.15f));  // yellow
 
         // Texture with alpha from shape(u, v), where u and v run from -1 to 1 across the texture.
         private static Texture2D CreateTexture(int size, System.Func<float, float, float> shape)
