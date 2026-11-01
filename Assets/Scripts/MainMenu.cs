@@ -5,6 +5,15 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
+    [Tooltip("Hidden in browser builds, where a page cannot close itself.")]
+    [SerializeField] private GameObject quitButton;
+
+    private void Awake()
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        if (quitButton != null) quitButton.SetActive(false);
+#endif
+    }
 
     public void PlayGame()
     {
