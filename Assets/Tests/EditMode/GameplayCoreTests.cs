@@ -597,6 +597,19 @@ namespace TinyRoadTrip.Gameplay.Tests
         }
 
         [Test]
+        public void Begin_StartsWarningRightAway()
+        {
+            var w = Make();
+            var rng = new System.Random(1);
+            Run(w, 1f, false, rng);
+            w.Begin(WeatherKind.Rain);
+            Assert.AreEqual(WeatherSchedule.Phase.Warning, w.State);
+            Assert.AreEqual(WeatherKind.Rain, w.Kind);
+            Run(w, 2f + 4f + 1f, false, rng);
+            Assert.AreEqual(WeatherSchedule.Phase.Active, w.State);
+        }
+
+        [Test]
         public void RainRules_ScaleWithRuleLevel()
         {
             Assert.AreEqual(1f, WeatherRules.SteerFactor(WeatherKind.Clear, 1f));

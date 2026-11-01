@@ -52,6 +52,15 @@ namespace TinyRoadTrip.Gameplay.Core
             last = WeatherKind.Clear;
         }
 
+        // Starts a spell of this weather now (skips the clear wait and the calm check). For testing.
+        public void Begin(WeatherKind kind)
+        {
+            if (kind == WeatherKind.Clear) return;
+            Kind = kind;
+            Enter(Phase.Warning, WarningTime);
+            UpdateLevels();
+        }
+
         // calm: the traffic is in a calm phase right now. random: 0..1 rolls.
         public void Tick(float deltaTime, bool calm, Random random)
         {
