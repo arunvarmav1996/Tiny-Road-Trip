@@ -24,7 +24,7 @@ namespace TinyRoadTrip.Gameplay
     }
 
     // The run's score: distance in kilometres. Replaces the old Visual Scripting point score on the HUD.
-    // Distance = steady travel (1 km per 30 s at normal speed, scaled by Slow-Time/Nitro) + near-miss bonus metres.
+    // Distance = steady travel (1 km per 30 s at normal speed, scaled by Slow-Time/Nitro and the weather bonus) + near-miss bonus metres.
     // On game over it saves the best distance and exposes the run summary for the Game Over panel.
     public class RunStats : MonoBehaviour
     {
@@ -33,6 +33,8 @@ namespace TinyRoadTrip.Gameplay
         [SerializeField] private GameplaySpeedController speedController;
         [SerializeField] private ComboManager comboManager;
         [SerializeField] private CoinManager coinManager;
+        [Tooltip("Optional. Bad weather makes distance count more (risk = reward).")]
+        [SerializeField] private WeatherDirector weather;
 
         [Header("HUD")]
         [Tooltip("The big score text at the top of the screen (ScoreUI).")]
@@ -80,6 +82,7 @@ namespace TinyRoadTrip.Gameplay
         {
             if (finished) return;
             float multiplier = speedController != null ? speedController.Multiplier : 1f;
+            if (weather != null) multiplier *= weather.DistanceFactor;
             run.AddTravel(Time.deltaTime, metersPerSecond, multiplier);
             RefreshHud();
         }

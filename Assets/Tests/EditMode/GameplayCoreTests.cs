@@ -501,4 +501,109 @@ namespace TinyRoadTrip.Gameplay.Tests
             Assert.IsFalse(v.WouldCloseRow(Cars((0, 0f), (1, 0f), (2, 0f), (3, 4f)), 3, 5), "still far away");
         }
     }
+
+    public class WeatherScheduleTests
+    {
+        private static WeatherSchedule Make()
+        {
+            return new WeatherSchedule { WarmUp = 10f, MinClear = 5f, MaxClear = 5f, MinDuration = 20f, MaxDuration = 20f,
+                                         WarningTime = 2f, FadeTime = 4f, MaxCalmWait = 8f, WarningVisual = 0.4f };
+        }
+
+        private static void Run(WeatherSchedule w, float seconds, bool calm, System.Random rng)
+        {
+            for (float t = 0f; t < seconds - 1e-4f; t += 0.1f) w.Tick(0.1f, calm, rng);
+        }
+
+        [Test]
+        public void StartsClearThroughWarmUp()
+        {
+            var w = Make();
+            var rng = new System.Random(1);
+            Run(w, 9.5f, true, rng);
+            Assert.AreEqual(WeatherKind.Clear, w.Kind);
+            Assert.AreEqual(0f, w.Visual);
+            Assert.AreEqual(0f, w.Rule);
+        }
+
+        [Test]
+        public void WarningShowsVisualsBeforeRulesApply()
+        {
+            var w = Make();
+            var rng = new System.Random(1);
+            Run(w, 11f, true, rng);
+            Assert.AreEqual(WeatherSchedule.Phase.Warning, w.State);
+            Assert.AreEqual(WeatherKind.Rain, w.Kind);
+            Assert.Greater(w.Visual, 0f);
+            Assert.AreEqual(0f, w.Rule, "no gameplay effect during the warning");
+
+            Run(w, 1.5f + 2f, true, rng); // into the fade-in
+            Assert.AreEqual(WeatherSchedule.Phase.FadeIn, w.State);
+            Assert.Greater(w.Rule, 0f);
+            Assert.Less(w.Rule, 1f);
+            Assert.GreaterOrEqual(w.Visual, 0.4f);
+        }
+
+        [Test]
+        public void FullCycle_ActiveThenFadesBackToClear()
+        {
+            var w = Make();
+            var rng = new System.Random(1);
+            Run(w, 10f + 2f + 4f + 1f, true, rng);
+            Assert.AreEqual(WeatherSchedule.Phase.Active, w.State);
+            Assert.AreEqual(1f, w.Visual);
+            Assert.AreEqual(1f, w.Rule);
+
+            Run(w, 19f + 2f, true, rng);
+            Assert.AreEqual(WeatherSchedule.Phase.FadeOut, w.State);
+            Assert.Less(w.Rule, 1f);
+
+            Run(w, 3f, true, rng);
+            Assert.AreEqual(WeatherSchedule.Phase.Clear, w.State);
+            Assert.AreEqual(WeatherKind.Clear, w.Kind);
+            Assert.AreEqual(0f, w.Visual);
+        }
+
+        [Test]
+        public void WaitsForCalmTrafficButNotForever()
+        {
+            var w = Make();
+            var rng = new System.Random(1);
+            Run(w, 10f + 7f, false, rng);
+            Assert.AreEqual(WeatherKind.Clear, w.Kind, "busy traffic holds the weather back");
+            Run(w, 1.5f, false, rng);
+            Assert.AreEqual(WeatherSchedule.Phase.Warning, w.State, "starts after MaxCalmWait anyway");
+        }
+
+        [Test]
+        public void NoWeight_StaysClear()
+        {
+            var w = Make();
+            w.RainWeight = 0f;
+            Run(w, 60f, true, new System.Random(1));
+            Assert.AreEqual(WeatherKind.Clear, w.Kind);
+        }
+
+        [Test]
+        public void Reset_StartsANewRunClear()
+        {
+            var w = Make();
+            var rng = new System.Random(1);
+            Run(w, 20f, true, rng);
+            w.Reset();
+            Assert.AreEqual(WeatherSchedule.Phase.Clear, w.State);
+            Run(w, 9.5f, true, rng);
+            Assert.AreEqual(WeatherKind.Clear, w.Kind, "warm-up applies again");
+        }
+
+        [Test]
+        public void RainRules_ScaleWithRuleLevel()
+        {
+            Assert.AreEqual(1f, WeatherRules.SteerFactor(WeatherKind.Clear, 1f));
+            Assert.AreEqual(1f, WeatherRules.SteerFactor(WeatherKind.Rain, 0f));
+            Assert.AreEqual(WeatherRules.RainSteerFactor, WeatherRules.SteerFactor(WeatherKind.Rain, 1f), 1e-5f);
+            Assert.AreEqual(WeatherRules.RainDistanceBonus, WeatherRules.DistanceFactor(WeatherKind.Rain, 1f), 1e-5f);
+            Assert.AreEqual(1f, WeatherRules.DistanceFactor(WeatherKind.Clear, 1f));
+        }
+    }
 }
