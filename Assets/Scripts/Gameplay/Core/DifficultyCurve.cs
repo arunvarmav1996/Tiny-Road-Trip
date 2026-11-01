@@ -2,7 +2,9 @@ using System;
 
 namespace TinyRoadTrip.Gameplay.Core
 {
-    // Run difficulty from elapsed time. Base level rises fast early and levels off (1 - e^(-t/rampTime)).
+    // Run difficulty from elapsed time. Base level stays at 0 for a grace period (single cars, slow), then eases in:
+    // with x = (t - Grace) / RampTime, level = x^2 / (1 + x^2). That starts flat, reaches 0.5 after one RampTime
+    // and keeps creeping towards 1, so the run gets harder gradually instead of all in the first half-minute.
     // On top, traffic comes in waves: a busy phase that tightens towards its end, then a short calm phase
     // with fewer cars. Speed follows only the base level so cars already on the road never jump in speed.
     [Serializable]
@@ -12,7 +14,8 @@ namespace TinyRoadTrip.Gameplay.Core
         public float MaxSpeed = 5.5f;
         public float StartInterval = 1.4f;
         public float MinInterval = 0.75f;
-        public float RampTime = 45f;
+        public float Grace = 20f;
+        public float RampTime = 90f;
 
         public float WarmUp = 12f;          // no calm phase before this
         public float BusyDuration = 20f;
@@ -20,11 +23,14 @@ namespace TinyRoadTrip.Gameplay.Core
         public float BusyPeakIntervalMultiplier = 0.85f; // end of each busy phase: tighter spacing
         public float CalmIntervalMultiplier = 1.9f;      // calm phase: fewer cars
 
-        // 0 at the start, approaching 1 as the run goes on.
+        // 0 through the grace period, then easing towards 1 as the run goes on.
         public float Level(float time)
         {
-            if (time <= 0f || RampTime <= 0f) return time > 0f ? 1f : 0f;
-            return 1f - (float)Math.Exp(-time / RampTime);
+            float t = time - Grace;
+            if (t <= 0f) return 0f;
+            if (RampTime <= 0f) return 1f;
+            float x = t / RampTime;
+            return x * x / (1f + x * x);
         }
 
         public float Speed(float time)
