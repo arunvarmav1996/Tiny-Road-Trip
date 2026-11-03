@@ -528,11 +528,11 @@ namespace TinyRoadTrip.Gameplay
         }
 
         // White disc with a soft edge.
-        private static Texture2D CreateDotTexture(int size) =>
+        internal static Texture2D CreateDotTexture(int size) =>
             CreateTexture(size, (u, v) => (1f - Mathf.Sqrt(u * u + v * v)) / 0.4f);
 
         // White ring with soft edges.
-        private static Texture2D CreateRingTexture(int size) =>
+        internal static Texture2D CreateRingTexture(int size) =>
             CreateTexture(size, (u, v) => 1f - Mathf.Abs(Mathf.Sqrt(u * u + v * v) - 0.8f) / 0.15f);
 
         // Rounded petal: an ellipse a little narrower at one end.
