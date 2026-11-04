@@ -23,6 +23,9 @@ public class PlayerController : MonoBehaviour
              "already adapts the view, and using both scales the game twice.")]
     [SerializeField] private bool adaptLaneDistanceToAspect = false;
 
+    [Tooltip("Optional. Rain makes lane changes slower (slippery road).")]
+    [SerializeField] private TinyRoadTrip.Gameplay.WeatherDirector weather;
+
 
     private void Awake()
     {
@@ -166,9 +169,16 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // Snow patches lower this while the car is on one: lane changes answer slowly.
+    public float Grip { get; set; } = 1f;
+
+    // Where the car is steering to; snow patches keep their slide within reach of it.
+    public Vector3 LaneTarget => targetPosition;
+
     void MoveToTargetLane()
     {
-        transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+        float steer = (weather != null ? weather.SteerFactor : 1f) * Grip;
+        transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * steer * Time.deltaTime);
     }
     
     void OnCollisionEnter2D(Collision2D collision)

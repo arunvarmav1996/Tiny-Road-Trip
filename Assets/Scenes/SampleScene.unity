@@ -742,6 +742,11 @@ MonoBehaviour:
     FollowGap: 1.7
     RowBand: 1.4
     RowGuardMargin: 0.6
+  gaps:
+    EasyGapFactor: 1.8
+    HardGapFactor: 1.3
+    AlignTolerance: 0.3
+    MaxLift: 12
   adaptLanesToAspect: 0
   speedController: {fileID: 1917952524}
   despawnBelowY: -12
@@ -2109,6 +2114,7 @@ MonoBehaviour:
   numLanes: 5
   dashSpeed: 2
   adaptLaneDistanceToAspect: 0
+  weather: {fileID: 1300829329}
   minSwipeDistance: 60
 --- !u!50 &395117825
 Rigidbody2D:
@@ -2592,6 +2598,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5819df5e5295f4b91a50f62b57ac47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  quitButton: {fileID: 0}
 --- !u!114 &519420034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5408,6 +5415,343 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2b338f28bbedbf34d94a9dfe3e565847, type: 3}
+--- !u!1 &1300829328
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1300829330}
+  - component: {fileID: 1300829329}
+  - component: {fileID: 1300829331}
+  - component: {fileID: 1300829332}
+  - component: {fileID: 1300829333}
+  m_Layer: 0
+  m_Name: Weather
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1300829329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1300829328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f3a9489f88240a8a9d741ecc62b7567, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TinyRoadTrip.Gameplay.WeatherDirector
+  schedule:
+    WarmUp: 30
+    MinClear: 15
+    MaxClear: 30
+    MinDuration: 25
+    MaxDuration: 40
+    WarningTime: 3
+    FadeTime: 4
+    MaxCalmWait: 15
+    WarningVisual: 0.35
+    RainWeight: 1
+    SnowWeight: 1
+    SpringWeight: 1
+    SummerWeight: 1
+    FallWeight: 1
+  spawner: {fileID: 153388343}
+  targetCamera: {fileID: 519420031}
+  road: {fileID: 565693278}
+  speedController: {fileID: 1917952524}
+  gradeShader: {fileID: 4800000, guid: b3e2655004ef30d43a6c7f43ba90740c, type: 3}
+  rainGrade:
+    tint: {r: 0.55, g: 0.68, b: 1, a: 1}
+    tintStrength: 0.45
+    saturation: 0.75
+    contrast: 1.05
+    brightness: 0.8
+  rainDropColor: {r: 0.75, g: 0.85, b: 1, a: 0.45}
+  rainEmissionRate: 52
+  rainSpeed: 6.5
+  rainSlant: -1.33
+  splashColor: {r: 0.8, g: 0.9, b: 1, a: 0.55}
+  splashEmissionRate: 45
+  splashSize: 0.28
+  snowGrade:
+    tint: {r: 0.82, g: 0.9, b: 1, a: 1}
+    tintStrength: 0.4
+    saturation: 0.7
+    contrast: 0.95
+    brightness: 1.08
+  snowflakeColor: {r: 1, g: 1, b: 1, a: 0.9}
+  snowEmissionRate: 10
+  snowFallSpeed: 0.2
+  snowWobble: 0.3
+  settledEmissionRate: 15
+  springGrade:
+    tint: {r: 1, g: 0.86, b: 0.93, a: 1}
+    tintStrength: 0.3
+    saturation: 1.35
+    contrast: 1.08
+    brightness: 1.05
+  petalColors:
+    serializedVersion: 2
+    key0: {r: 1, g: 0.72, b: 0.82, a: 0.95}
+    key1: {r: 1, g: 0.95, b: 0.97, a: 0.95}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  petalEmissionRate: 4
+  petalGustiness: 0.466
+  petalFallSpeed: 0.5
+  petalWobble: 0.5
+  summerGrade:
+    tint: {r: 1, g: 0.86, b: 0.55, a: 1}
+    tintStrength: 0.35
+    saturation: 1.4
+    contrast: 1.12
+    brightness: 1.08
+  moteColors:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 0.75, a: 0.7}
+    key1: {r: 1, g: 0.85, b: 0.3, a: 0.7}
+    key2: {r: 1, g: 0.6, b: 0.15, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 32768
+    ctime2: 65535
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 3
+    m_NumAlphaKeys: 2
+  moteEmissionRate: 6.5
+  fallGrade:
+    tint: {r: 1, g: 0.72, b: 0.42, a: 1}
+    tintStrength: 0.4
+    saturation: 1.3
+    contrast: 1.1
+    brightness: 1
+  leafColors:
+    serializedVersion: 2
+    key0: {r: 0.9, g: 0.12, b: 0.08, a: 0.95}
+    key1: {r: 1, g: 0.4, b: 0.05, a: 0.95}
+    key2: {r: 1, g: 0.6, b: 0.1, a: 0}
+    key3: {r: 1, g: 0.85, b: 0.15, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 21845
+    ctime2: 43690
+    ctime3: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
+  leafEmissionRate: 2
+  leafFallSpeed: 0.7
+  leafWobble: 0.2
+  settledLeafEmissionRate: 2
+--- !u!4 &1300829330
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1300829328}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1300829331
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1300829328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: faff308cc0659e748a6d08d97d8370b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TinyRoadTrip.Gameplay.RainPuddles
+  weather: {fileID: 1300829329}
+  spawner: {fileID: 153388343}
+  player: {fileID: 395117826}
+  road: {fileID: 565693278}
+  targetCamera: {fileID: 519420031}
+  puddles:
+    PerSecond: 0.7
+    Max: 10
+    RoadHalfWidth: 2.2
+    Width: {x: 0.9, y: 1.7}
+    Aspect: {x: 0.45, y: 0.75}
+    Color: {r: 1, g: 1, b: 1, a: 0.85}
+    FillSeconds: 3
+    HitScale: 0.8
+  raindropRipplesPerPuddle: 3
+  rippleColor: {r: 0.8, g: 0.9, b: 1, a: 0.6}
+  sprayColor: {r: 0.82, g: 0.9, b: 1, a: 0.85}
+  burstDroplets: 12
+  trailDropletsPerSecond: 35
+  sprayOutSpeed: {x: 1.4, y: 3.4}
+  dropletSize: {x: 0.05, y: 0.12}
+--- !u!114 &1300829332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1300829328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a1b751bcb04ddb41aa134e19775c9c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TinyRoadTrip.Gameplay.SnowPatches
+  weather: {fileID: 1300829329}
+  spawner: {fileID: 153388343}
+  player: {fileID: 395117826}
+  road: {fileID: 565693278}
+  targetCamera: {fileID: 519420031}
+  snowPatches:
+    PerSecond: 0.6
+    Max: 10
+    RoadHalfWidth: 2.2
+    Width: {x: 1, y: 1.9}
+    Aspect: {x: 0.4, y: 0.7}
+    Color: {r: 1, g: 1, b: 1, a: 0.95}
+    FillSeconds: 4
+    HitScale: 0.8
+  playerGrip: 0.3
+  playerSlideSpeed: 1.6
+  playerJolt: 1.4
+  playerMaxSlide: 0.6
+  playerMaxX: 2.3
+  playerMaxAngle: 10
+  gripRecoverSeconds: 0.5
+  trafficMaxSlide: 0.25
+  trafficSlideSpeed: 0.9
+  trafficMaxAngle: 12
+  powderColor: {r: 1, g: 1, b: 1, a: 0.9}
+  burstPuffs: 8
+  trailPuffsPerSecond: 18
+  puffSize: {x: 0.08, y: 0.18}
+--- !u!114 &1300829333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1300829328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 136d97cc12187cf4dad63ff39a2d7232, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TinyRoadTrip.Gameplay.SummerLensFlare
+  weather: {fileID: 1300829329}
+  targetCamera: {fileID: 519420031}
+  flareShader: {fileID: 4800000, guid: cb57839e0b1ddc54fb3fc9d461106b65, type: 3}
+  overallStrength: 0.6
+  burstStrength: 1
+  ghostStrength: 0.5
+  sunPosition: {x: 0.8, y: 1}
+  sunDrift: 0.06
+  sunDriftSeconds: 60
+  burstSize: 1.1
+  burstColor: {r: 1, g: 0.93, b: 0.75, a: 0.8}
+  spikeStrength: 0.5
+  burstSpin: 0.5
+  pulse: 0.05
+  ghostScale: 1
+  ghosts:
+  - Position: 0.3
+    Size: 0.3
+    Color: {r: 1, g: 0.72, b: 0.3, a: 0.14}
+    Shape: 0
+  - Position: 0.5
+    Size: 0.2
+    Color: {r: 0.55, g: 1, b: 0.6, a: 0.14}
+    Shape: 1
+  - Position: 0.74
+    Size: 0.46
+    Color: {r: 1, g: 0.55, b: 0.25, a: 0.12}
+    Shape: 2
+  - Position: 1.02
+    Size: 0.12
+    Color: {r: 1, g: 0.95, b: 0.8, a: 0.16}
+    Shape: 0
+  - Position: 1.3
+    Size: 0.42
+    Color: {r: 0.4, g: 0.85, b: 1, a: 0.11}
+    Shape: 1
+  - Position: 1.62
+    Size: 0.68
+    Color: {r: 0.75, g: 0.5, b: 1, a: 0.08}
+    Shape: 0
+  - Position: 1.95
+    Size: 1
+    Color: {r: 1, g: 0.7, b: 0.5, a: 0.09}
+    Shape: 2
 --- !u!1 &1307068578
 GameObject:
   m_ObjectHideFlags: 0
@@ -8818,6 +9162,7 @@ MonoBehaviour:
   speedController: {fileID: 1917952524}
   comboManager: {fileID: 1917952526}
   coinManager: {fileID: 1917952532}
+  weather: {fileID: 1300829329}
   distanceText: {fileID: 1141399023}
   unitSuffix: <size=45%> km</size>
   metersPerSecond: 33.333332
@@ -9829,4 +10174,5 @@ SceneRoots:
   - {fileID: 1473656733}
   - {fileID: 1601899220}
   - {fileID: 286848627}
+  - {fileID: 1300829330}
   - {fileID: 1957037295}

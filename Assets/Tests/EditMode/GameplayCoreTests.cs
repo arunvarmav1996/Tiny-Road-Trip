@@ -508,6 +508,196 @@ namespace TinyRoadTrip.Gameplay.Tests
         }
     }
 
+    public class WeatherScheduleTests
+    {
+        private static WeatherSchedule Make()
+        {
+            return new WeatherSchedule { WarmUp = 10f, MinClear = 5f, MaxClear = 5f, MinDuration = 20f, MaxDuration = 20f,
+                                         WarningTime = 2f, FadeTime = 4f, MaxCalmWait = 8f, WarningVisual = 0.4f,
+                                         SnowWeight = 0f, SpringWeight = 0f, SummerWeight = 0f, FallWeight = 0f };
+            // rain only unless a test turns others on
+        }
+
+        private static void Run(WeatherSchedule w, float seconds, bool calm, System.Random rng)
+        {
+            for (float t = 0f; t < seconds - 1e-4f; t += 0.1f) w.Tick(0.1f, calm, rng);
+        }
+
+        [Test]
+        public void StartsClearThroughWarmUp()
+        {
+            var w = Make();
+            var rng = new System.Random(1);
+            Run(w, 9.5f, true, rng);
+            Assert.AreEqual(WeatherKind.Clear, w.Kind);
+            Assert.AreEqual(0f, w.Visual);
+            Assert.AreEqual(0f, w.Rule);
+        }
+
+        [Test]
+        public void WarningShowsVisualsBeforeRulesApply()
+        {
+            var w = Make();
+            var rng = new System.Random(1);
+            Run(w, 11f, true, rng);
+            Assert.AreEqual(WeatherSchedule.Phase.Warning, w.State);
+            Assert.AreEqual(WeatherKind.Rain, w.Kind);
+            Assert.Greater(w.Visual, 0f);
+            Assert.AreEqual(0f, w.Rule, "no gameplay effect during the warning");
+
+            Run(w, 1.5f + 2f, true, rng); // into the fade-in
+            Assert.AreEqual(WeatherSchedule.Phase.FadeIn, w.State);
+            Assert.Greater(w.Rule, 0f);
+            Assert.Less(w.Rule, 1f);
+            Assert.GreaterOrEqual(w.Visual, 0.4f);
+        }
+
+        [Test]
+        public void FullCycle_ActiveThenFadesBackToClear()
+        {
+            var w = Make();
+            var rng = new System.Random(1);
+            Run(w, 10f + 2f + 4f + 1f, true, rng);
+            Assert.AreEqual(WeatherSchedule.Phase.Active, w.State);
+            Assert.AreEqual(1f, w.Visual);
+            Assert.AreEqual(1f, w.Rule);
+
+            Run(w, 19f + 2f, true, rng);
+            Assert.AreEqual(WeatherSchedule.Phase.FadeOut, w.State);
+            Assert.Less(w.Rule, 1f);
+
+            Run(w, 3f, true, rng);
+            Assert.AreEqual(WeatherSchedule.Phase.Clear, w.State);
+            Assert.AreEqual(WeatherKind.Clear, w.Kind);
+            Assert.AreEqual(0f, w.Visual);
+        }
+
+        [Test]
+        public void WaitsForCalmTrafficButNotForever()
+        {
+            var w = Make();
+            var rng = new System.Random(1);
+            Run(w, 10f + 7f, false, rng);
+            Assert.AreEqual(WeatherKind.Clear, w.Kind, "busy traffic holds the weather back");
+            Run(w, 1.5f, false, rng);
+            Assert.AreEqual(WeatherSchedule.Phase.Warning, w.State, "starts after MaxCalmWait anyway");
+        }
+
+        [Test]
+        public void NoWeight_StaysClear()
+        {
+            var w = Make();
+            w.RainWeight = 0f;
+            w.SnowWeight = 0f;
+            Run(w, 60f, true, new System.Random(1));
+            Assert.AreEqual(WeatherKind.Clear, w.Kind);
+        }
+
+        [Test]
+        public void Reset_StartsANewRunClear()
+        {
+            var w = Make();
+            var rng = new System.Random(1);
+            Run(w, 20f, true, rng);
+            w.Reset();
+            Assert.AreEqual(WeatherSchedule.Phase.Clear, w.State);
+            Run(w, 9.5f, true, rng);
+            Assert.AreEqual(WeatherKind.Clear, w.Kind, "warm-up applies again");
+        }
+
+        [Test]
+        public void Begin_StartsWarningRightAway()
+        {
+            var w = Make();
+            var rng = new System.Random(1);
+            Run(w, 1f, false, rng);
+            w.Begin(WeatherKind.Rain);
+            Assert.AreEqual(WeatherSchedule.Phase.Warning, w.State);
+            Assert.AreEqual(WeatherKind.Rain, w.Kind);
+            Run(w, 2f + 4f + 1f, false, rng);
+            Assert.AreEqual(WeatherSchedule.Phase.Active, w.State);
+        }
+
+        [Test]
+        public void SameWeatherNeverTwiceInARow()
+        {
+            var w = Make();
+            w.SnowWeight = w.SpringWeight = w.SummerWeight = w.FallWeight = 1f;
+            var rng = new System.Random(42);
+            var spells = new System.Collections.Generic.List<WeatherKind>();
+            WeatherKind current = WeatherKind.Clear;
+            for (int i = 0; i < 20000; i++)
+            {
+                w.Tick(0.1f, true, rng);
+                if (w.Kind != WeatherKind.Clear && w.Kind != current) spells.Add(w.Kind);
+                current = w.Kind;
+            }
+            Assert.Greater(spells.Count, 20);
+            Assert.Contains(WeatherKind.Rain, spells);
+            Assert.Contains(WeatherKind.Snow, spells);
+            Assert.Contains(WeatherKind.Spring, spells);
+            Assert.Contains(WeatherKind.Summer, spells);
+            Assert.Contains(WeatherKind.Fall, spells);
+            for (int i = 1; i < spells.Count; i++)
+                Assert.AreNotEqual(spells[i - 1], spells[i], "spell " + i);
+        }
+
+        [Test]
+        public void OnlyOneWeightedWeather_RepeatsIt()
+        {
+            var w = Make();
+            w.RainWeight = 0f;
+            w.SnowWeight = 1f;
+            var rng = new System.Random(3);
+            Run(w, 200f, true, rng);
+            Assert.AreNotEqual(WeatherKind.Rain, w.Kind);
+            bool sawSnow = false;
+            for (int i = 0; i < 2000; i++)
+            {
+                w.Tick(0.1f, true, rng);
+                Assert.AreNotEqual(WeatherKind.Rain, w.Kind);
+                sawSnow |= w.Kind == WeatherKind.Snow;
+            }
+            Assert.IsTrue(sawSnow);
+        }
+
+        [Test]
+        public void SnowRules_SlowTheWorldButPayMore()
+        {
+            Assert.AreEqual(WeatherRules.SnowWorldSpeed, WeatherRules.WorldSpeedFactor(WeatherKind.Snow, 1f), 1e-5f);
+            Assert.AreEqual(1f, WeatherRules.WorldSpeedFactor(WeatherKind.Rain, 1f));
+            Assert.AreEqual(1f, WeatherRules.WorldSpeedFactor(WeatherKind.Snow, 0f));
+            Assert.Less(WeatherRules.SteerFactor(WeatherKind.Snow, 1f), WeatherRules.SteerFactor(WeatherKind.Rain, 1f), "ice is worse than rain");
+            Assert.Greater(WeatherRules.SnowWorldSpeed * WeatherRules.SnowDistanceBonus, 1f, "snow still pays off");
+        }
+
+        [Test]
+        public void SeasonRules_SpringIsABreatherSummerIsFastFallIsSlippery()
+        {
+            Assert.AreEqual(1f, WeatherRules.SteerFactor(WeatherKind.Spring, 1f));
+            Assert.AreEqual(1f, WeatherRules.WorldSpeedFactor(WeatherKind.Spring, 1f));
+            Assert.Greater(WeatherRules.DistanceFactor(WeatherKind.Spring, 1f), 1f);
+
+            Assert.Greater(WeatherRules.WorldSpeedFactor(WeatherKind.Summer, 1f), 1f);
+            Assert.AreEqual(1f, WeatherRules.SteerFactor(WeatherKind.Summer, 1f));
+
+            float fallSteer = WeatherRules.SteerFactor(WeatherKind.Fall, 1f);
+            Assert.Less(fallSteer, 1f);
+            Assert.Greater(fallSteer, WeatherRules.SteerFactor(WeatherKind.Rain, 1f), "leaves are milder than rain");
+            Assert.AreEqual(1f, WeatherRules.WorldSpeedFactor(WeatherKind.Fall, 1f));
+        }
+
+        [Test]
+        public void RainRules_ScaleWithRuleLevel()
+        {
+            Assert.AreEqual(1f, WeatherRules.SteerFactor(WeatherKind.Clear, 1f));
+            Assert.AreEqual(1f, WeatherRules.SteerFactor(WeatherKind.Rain, 0f));
+            Assert.AreEqual(WeatherRules.RainSteerFactor, WeatherRules.SteerFactor(WeatherKind.Rain, 1f), 1e-5f);
+            Assert.AreEqual(WeatherRules.RainDistanceBonus, WeatherRules.DistanceFactor(WeatherKind.Rain, 1f), 1e-5f);
+            Assert.AreEqual(1f, WeatherRules.DistanceFactor(WeatherKind.Clear, 1f));
+        }
+    }
+
     public class TrafficGapsTests
     {
         private static readonly System.Collections.Generic.List<GapCar> None = new System.Collections.Generic.List<GapCar>();
