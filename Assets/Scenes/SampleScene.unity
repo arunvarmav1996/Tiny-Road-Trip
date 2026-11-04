@@ -5426,6 +5426,7 @@ GameObject:
   - component: {fileID: 1300829330}
   - component: {fileID: 1300829329}
   - component: {fileID: 1300829331}
+  - component: {fileID: 1300829332}
   m_Layer: 0
   m_Name: Weather
   m_TagString: Untagged
@@ -5639,13 +5640,15 @@ MonoBehaviour:
   player: {fileID: 395117826}
   road: {fileID: 565693278}
   targetCamera: {fileID: 519420031}
-  puddlesPerSecond: 0.7
-  maxPuddles: 10
-  roadHalfWidth: 2.2
-  puddleWidth: {x: 0.9, y: 1.7}
-  puddleAspect: {x: 0.45, y: 0.75}
-  puddleColor: {r: 1, g: 1, b: 1, a: 0.85}
-  fillSeconds: 3
+  puddles:
+    PerSecond: 0.7
+    Max: 10
+    RoadHalfWidth: 2.2
+    Width: {x: 0.9, y: 1.7}
+    Aspect: {x: 0.45, y: 0.75}
+    Color: {r: 1, g: 1, b: 1, a: 0.85}
+    FillSeconds: 3
+    HitScale: 0.8
   raindropRipplesPerPuddle: 3
   rippleColor: {r: 0.8, g: 0.9, b: 1, a: 0.6}
   sprayColor: {r: 0.82, g: 0.9, b: 1, a: 0.85}
@@ -5653,6 +5656,46 @@ MonoBehaviour:
   trailDropletsPerSecond: 35
   sprayOutSpeed: {x: 1.4, y: 3.4}
   dropletSize: {x: 0.05, y: 0.12}
+--- !u!114 &1300829332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1300829328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a1b751bcb04ddb41aa134e19775c9c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TinyRoadTrip.Gameplay.SnowPatches
+  weather: {fileID: 1300829329}
+  spawner: {fileID: 153388343}
+  player: {fileID: 395117826}
+  road: {fileID: 565693278}
+  targetCamera: {fileID: 519420031}
+  snowPatches:
+    PerSecond: 0.6
+    Max: 10
+    RoadHalfWidth: 2.2
+    Width: {x: 1, y: 1.9}
+    Aspect: {x: 0.4, y: 0.7}
+    Color: {r: 1, g: 1, b: 1, a: 0.95}
+    FillSeconds: 4
+    HitScale: 0.8
+  playerGrip: 0.3
+  playerSlideSpeed: 1.6
+  playerJolt: 1.4
+  playerMaxSlide: 0.6
+  playerMaxX: 2.3
+  playerMaxAngle: 10
+  gripRecoverSeconds: 0.5
+  trafficMaxSlide: 0.25
+  trafficSlideSpeed: 0.9
+  trafficMaxAngle: 12
+  powderColor: {r: 1, g: 1, b: 1, a: 0.9}
+  burstPuffs: 8
+  trailPuffsPerSecond: 18
+  puffSize: {x: 0.08, y: 0.18}
 --- !u!1 &1307068578
 GameObject:
   m_ObjectHideFlags: 0
