@@ -232,6 +232,7 @@ public class Spawner : MonoBehaviour
         if(rb==null)
         rb=obs.AddComponent<Rigidbody2D>();
         rb.gravityScale = 0;
+        rb.interpolation = RigidbodyInterpolation2D.Interpolate; // keeps pace with the road, which moves every frame
         // A pooled car outlives runs (and scene reloads) and may still be turned from skidding on snow.
         obs.transform.rotation = Quaternion.identity;
         rb.rotation = 0f;

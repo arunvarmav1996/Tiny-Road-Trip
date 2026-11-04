@@ -111,7 +111,7 @@ namespace TinyRoadTrip.Gameplay
 
             float halfHeight = targetCamera.orthographicSize;
             float camY = targetCamera.transform.position.y;
-            float drift = road != null && road.rb != null ? road.rb.linearVelocity.y : 0f;
+            float drift = road != null ? road.Velocity : 0f;
 
             spawnCarry += dt * settings.PerSecond * weatherLevel;
             while (spawnCarry >= 1f)

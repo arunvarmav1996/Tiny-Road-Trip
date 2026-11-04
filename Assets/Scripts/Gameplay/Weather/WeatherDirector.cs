@@ -164,7 +164,7 @@ namespace TinyRoadTrip.Gameplay
             SetRate(leaves, leafEmissionRate * fallLevel);
             SetRate(settledLeaves, settledLeafEmissionRate * fallLevel);
 
-            float drift = road != null && road.rb != null ? road.rb.linearVelocity.y : 0f;
+            float drift = road != null ? road.Velocity : 0f;
             if (!Mathf.Approximately(drift, roadDrift))
             {
                 roadDrift = drift;

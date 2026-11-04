@@ -10,8 +10,10 @@ namespace TinyRoadTrip.Gameplay.Core
     [Serializable]
     public sealed class DifficultyCurve
     {
-        public float StartSpeed = 2.5f;
-        public float MaxSpeed = 5.5f;
+        // Oncoming traffic must stay faster than the road (BackgroundScroller.scrollSpeed), even a varied car at
+        // StartSpeed * (1 - TrafficVariety.SpeedSpread), or it looks like it is reversing.
+        public float StartSpeed = 4f;
+        public float MaxSpeed = 6.5f;
         public float StartInterval = 1.4f;
         public float MinInterval = 0.75f;
         public float Grace = 20f;

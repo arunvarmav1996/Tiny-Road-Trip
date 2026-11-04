@@ -24,6 +24,7 @@ namespace TinyRoadTrip.Gameplay
         private void Awake()
         {
             Rigidbody = GetComponent<Rigidbody2D>();
+            Rigidbody.interpolation = RigidbodyInterpolation2D.Interpolate; // keeps pace with the road, which moves every frame
             circle = GetComponent<CircleCollider2D>();
         }
 
