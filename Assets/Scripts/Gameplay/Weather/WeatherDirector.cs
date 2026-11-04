@@ -234,10 +234,15 @@ namespace TinyRoadTrip.Gameplay
             float halfWidth = halfHeight * targetCamera.aspect;
             Vector3 cam = targetCamera.transform.position;
 
-            // Emit above the top edge, a little wider than the view so slanted streaks cover the far side too.
-            rain.transform.position = new Vector3(cam.x - rainSlant * 0.3f, cam.y + halfHeight + 1f, 0f);
+            // Emit above the top edge. Lifetime lets the slowest streak reach the bottom whatever rainSpeed is set to.
+            // The emitter is wider than the view by the sideways travel in that time, so the slant covers the far side.
+            float rainLife = (halfHeight * 2f + 1.5f) / Mathf.Max(0.1f, rainSpeed * 0.9f);
+            float rainTravel = rainSlant * rainLife;
+            var rainMain = rain.main;
+            rainMain.startLifetime = rainLife;
+            rain.transform.position = new Vector3(cam.x - rainTravel * 0.5f, cam.y + halfHeight + 1f, 0f);
             var shape = rain.shape;
-            shape.scale = new Vector3(halfWidth * 2f + Mathf.Abs(rainSlant), 0.1f, 1f);
+            shape.scale = new Vector3(halfWidth * 2f + Mathf.Abs(rainTravel), 0.1f, 1f);
 
             CoverScreen(splashes, cam, halfWidth, halfHeight);
             CoverScreen(settledSnow, cam, halfWidth, halfHeight);
