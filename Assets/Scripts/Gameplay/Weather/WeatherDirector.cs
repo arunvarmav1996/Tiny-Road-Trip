@@ -7,7 +7,7 @@ namespace TinyRoadTrip.Gameplay
     //   Rain:   dark blue grade, slanted streaks, splash rings on the road.
     //   Snow:   pale cold grade, drifting flakes, flakes settling on the road.
     //   Spring: vivid rosy grade, fluttering petals.
-    //   Summer: vivid golden grade, sun glare in the top corner, heat motes rising off the road.
+    //   Summer: vivid golden grade, heat motes rising off the road, lens flare from the sun (SummerLensFlare).
     //   Fall:   vivid amber grade, spinning leaves, leaves settling on the road.
     // Each weather's screen grade (tint, saturation, contrast, brightness) is set in the inspector.
     // Every texture is generated here at startup, so the weathers add no art files to the build.
@@ -68,7 +68,6 @@ namespace TinyRoadTrip.Gameplay
         [Header("Summer")]
         [SerializeField] private ScreenGrade summerGrade = new ScreenGrade
             { tint = new Color(1f, 0.86f, 0.55f), tintStrength = 0.35f, saturation = 1.4f, contrast = 1.12f, brightness = 1.08f };
-        [SerializeField] private Color glareColor = new Color(1f, 0.88f, 0.35f, 0.65f);
         [Tooltip("Each heat mote picks a random colour along this gradient.")]
         [SerializeField] private Gradient moteColors = DefaultMoteColors();
         [SerializeField] private float moteEmissionRate = 24f;
@@ -85,7 +84,6 @@ namespace TinyRoadTrip.Gameplay
 
         private readonly System.Random random = new System.Random();
         private WeatherScreenFilter screenFilter;
-        private SpriteRenderer glare;
         private ParticleSystem rain;
         private ParticleSystem splashes;
         private ParticleSystem snow;
@@ -120,7 +118,6 @@ namespace TinyRoadTrip.Gameplay
                 screenFilter = targetCamera.gameObject.AddComponent<WeatherScreenFilter>();
                 screenFilter.Init(gradeShader);
             }
-            glare = CreateGlare(CreateGlowTexture(64));
             rain = CreateRain();
             splashes = CreateSplashes();
             snow = CreateFalling("WeatherSnow", dot, new ParticleSystem.MinMaxGradient(snowflakeColor), 0.06f, 0.16f, snowFallSpeed, snowWobble, 0f, 400);
@@ -157,12 +154,6 @@ namespace TinyRoadTrip.Gameplay
             // Only one weather at a time, so the grade is whichever one is active, faded in by Visual.
             if (screenFilter != null)
                 screenFilter.Set(ScreenGrade.Lerp(ScreenGrade.Neutral, GradeFor(schedule.Kind), schedule.Visual));
-
-            // Summer glare breathes slowly so the sun feels alive.
-            Color g = glareColor;
-            g.a *= summerLevel * (0.85f + 0.15f * Mathf.Sin(Time.time * 0.8f));
-            glare.color = g;
-            glare.enabled = g.a > 0.001f;
 
             SetRate(rain, rainEmissionRate * rainLevel);
             SetRate(splashes, splashEmissionRate * rainLevel);
@@ -243,10 +234,6 @@ namespace TinyRoadTrip.Gameplay
             float halfWidth = halfHeight * targetCamera.aspect;
             Vector3 cam = targetCamera.transform.position;
 
-            float glareSize = halfWidth * 2.2f;
-            glare.transform.position = new Vector3(cam.x + halfWidth * 0.9f, cam.y + halfHeight * 0.95f, 0f);
-            glare.transform.localScale = new Vector3(glareSize, glareSize, 1f);
-
             // Emit above the top edge, a little wider than the view so slanted streaks cover the far side too.
             rain.transform.position = new Vector3(cam.x - rainSlant * 0.3f, cam.y + halfHeight + 1f, 0f);
             var shape = rain.shape;
@@ -277,18 +264,6 @@ namespace TinyRoadTrip.Gameplay
             shape.scale = new Vector3(halfWidth * 2f + 1f, 0.1f, 1f);
             var main = ps.main;
             main.startLifetime = (halfHeight * 2f + 1f) / Mathf.Max(0.1f, fallSpeed * 0.6f);
-        }
-
-        // Soft sun glow in the top corner for summer.
-        private SpriteRenderer CreateGlare(Texture2D glow)
-        {
-            var go = new GameObject("WeatherSunGlare");
-            go.transform.SetParent(transform, false);
-            var sr = go.AddComponent<SpriteRenderer>();
-            sr.sprite = Sprite.Create(glow, new Rect(0, 0, glow.width, glow.height), new Vector2(0.5f, 0.5f), glow.width);
-            sr.sortingOrder = 6; // above road, cars and speed lines
-            sr.enabled = false;
-            return sr;
         }
 
         private ParticleSystem CreateRain()
@@ -507,7 +482,7 @@ namespace TinyRoadTrip.Gameplay
             new Color(1f, 0.85f, 0.15f));  // yellow
 
         // Texture with alpha from shape(u, v), where u and v run from -1 to 1 across the texture.
-        private static Texture2D CreateTexture(int size, System.Func<float, float, float> shape)
+        internal static Texture2D CreateTexture(int size, System.Func<float, float, float> shape)
         {
             var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
             tex.wrapMode = TextureWrapMode.Clamp;
@@ -553,14 +528,6 @@ namespace TinyRoadTrip.Gameplay
                 float edge = (halfWidth - Mathf.Abs(u)) / 0.12f;
                 float vein = Mathf.Abs(u) < 0.05f ? 0.7f : 1f;
                 return Mathf.Min(edge, 1f) * vein;
-            });
-
-        // Soft radial glow: bright centre fading to nothing at the edge.
-        private static Texture2D CreateGlowTexture(int size) =>
-            CreateTexture(size, (u, v) =>
-            {
-                float d = Mathf.Clamp01(Mathf.Sqrt(u * u + v * v));
-                return (1f - d) * (1f - d);
             });
     }
 }

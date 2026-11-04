@@ -5427,6 +5427,7 @@ GameObject:
   - component: {fileID: 1300829329}
   - component: {fileID: 1300829331}
   - component: {fileID: 1300829332}
+  - component: {fileID: 1300829333}
   m_Layer: 0
   m_Name: Weather
   m_TagString: Untagged
@@ -5536,7 +5537,6 @@ MonoBehaviour:
     saturation: 1.4
     contrast: 1.12
     brightness: 1.08
-  glareColor: {r: 1, g: 0.88, b: 0.35, a: 0.65}
   moteColors:
     serializedVersion: 2
     key0: {r: 1, g: 1, b: 0.75, a: 0.7}
@@ -5696,6 +5696,62 @@ MonoBehaviour:
   burstPuffs: 8
   trailPuffsPerSecond: 18
   puffSize: {x: 0.08, y: 0.18}
+--- !u!114 &1300829333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1300829328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 136d97cc12187cf4dad63ff39a2d7232, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TinyRoadTrip.Gameplay.SummerLensFlare
+  weather: {fileID: 1300829329}
+  targetCamera: {fileID: 519420031}
+  flareShader: {fileID: 4800000, guid: cb57839e0b1ddc54fb3fc9d461106b65, type: 3}
+  overallStrength: 0.6
+  burstStrength: 1
+  ghostStrength: 0.5
+  sunPosition: {x: 0.8, y: 1}
+  sunDrift: 0.06
+  sunDriftSeconds: 60
+  burstSize: 1.1
+  burstColor: {r: 1, g: 0.93, b: 0.75, a: 0.8}
+  spikeStrength: 0.5
+  burstSpin: 0.5
+  pulse: 0.05
+  ghostScale: 1
+  ghosts:
+  - Position: 0.3
+    Size: 0.3
+    Color: {r: 1, g: 0.72, b: 0.3, a: 0.14}
+    Shape: 0
+  - Position: 0.5
+    Size: 0.2
+    Color: {r: 0.55, g: 1, b: 0.6, a: 0.14}
+    Shape: 1
+  - Position: 0.74
+    Size: 0.46
+    Color: {r: 1, g: 0.55, b: 0.25, a: 0.12}
+    Shape: 2
+  - Position: 1.02
+    Size: 0.12
+    Color: {r: 1, g: 0.95, b: 0.8, a: 0.16}
+    Shape: 0
+  - Position: 1.3
+    Size: 0.42
+    Color: {r: 0.4, g: 0.85, b: 1, a: 0.11}
+    Shape: 1
+  - Position: 1.62
+    Size: 0.68
+    Color: {r: 0.75, g: 0.5, b: 1, a: 0.08}
+    Shape: 0
+  - Position: 1.95
+    Size: 1
+    Color: {r: 1, g: 0.7, b: 0.5, a: 0.09}
+    Shape: 2
 --- !u!1 &1307068578
 GameObject:
   m_ObjectHideFlags: 0
