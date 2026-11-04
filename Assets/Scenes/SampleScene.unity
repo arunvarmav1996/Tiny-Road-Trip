@@ -714,8 +714,8 @@ MonoBehaviour:
   - {fileID: 1769524343}
   - {fileID: 1556815187}
   difficulty:
-    StartSpeed: 2.5
-    MaxSpeed: 5.5
+    StartSpeed: 4
+    MaxSpeed: 6.5
     StartInterval: 1.4
     MinInterval: 0.75
     Grace: 20
@@ -2795,7 +2795,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   collider: {fileID: 565693277}
-  rb: {fileID: 565693276}
+  scrollSpeed: 3
+  loopPixels: 408
+  wrapBelowY: -2.89
   speedController: {fileID: 1917952524}
   adaptWidthToAspect: 0
 --- !u!1 &566240892

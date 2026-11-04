@@ -7,15 +7,25 @@ public class BackgroundScroller : MonoBehaviour
 {
 
     public BoxCollider2D collider;
-    public Rigidbody2D rb;
-    private float height;
-    private float scrollspeed =-2f;
+    [Tooltip("World units per second the road moves down at normal speed: how fast the player seems to drive. " +
+             "Keep below the slowest traffic speed (Spawner difficulty), or oncoming cars look like they reverse.")]
+    [SerializeField] private float scrollSpeed = 3f;
+    [Tooltip("The road image repeats every this many pixels (one pair of lane dashes x 2). The loop jumps by exactly " +
+             "this much so the jump is invisible; any other distance makes the lane dashes hop.")]
+    [SerializeField] private float loopPixels = 408f;
+    [Tooltip("The road jumps back up one loop when it gets this low. Set so the sprite covers the view on 20:9 phones.")]
+    [SerializeField] private float wrapBelowY = -2.89f;
+    private float loopHeight;
+    private float multiplier = 1f;
 
     [Tooltip("Optional. Scales the scroll speed for Slow-Time / Nitro.")]
     [SerializeField] private GameplaySpeedController speedController;
 
     // World units per second the road moves down at normal speed (collectibles ride the road at this speed).
-    public float BaseScrollSpeed => -scrollspeed;
+    public float BaseScrollSpeed => scrollSpeed;
+
+    // World units per second the road is moving right now (negative: down the screen).
+    public float Velocity => -scrollSpeed * multiplier;
 
     [Tooltip("Aspect-ratio road-width formula from the Difficulty-Setup branch. Off by default: ResponsiveCamera " +
              "already adapts the view, and using both scales the game twice.")]
@@ -38,17 +48,20 @@ public class BackgroundScroller : MonoBehaviour
         // Assigned in the scene; fall back to the component so a missing reference cannot break the scroller.
         if (collider == null)
             collider = GetComponent<BoxCollider2D>();
-        rb = GetComponent<Rigidbody2D>();
-        height = collider.size.y;
         collider.enabled =false;
 
-        float multiplier = 1f;
+        // Moved in Update, once per rendered frame: physics steps at 50 Hz would judder against the screen's 60.
+        Rigidbody2D body = GetComponent<Rigidbody2D>();
+        if (body != null) body.simulated = false;
+
+        SpriteRenderer sprite = GetComponent<SpriteRenderer>();
+        loopHeight = sprite.bounds.size.y / sprite.sprite.rect.height * loopPixels;
+
         if (speedController != null)
         {
             multiplier = speedController.Multiplier;
             speedController.MultiplierChanged += ApplySpeedMultiplier;
         }
-        ApplySpeedMultiplier(multiplier);
     }
 
     void OnDestroy()
@@ -57,18 +70,17 @@ public class BackgroundScroller : MonoBehaviour
             speedController.MultiplierChanged -= ApplySpeedMultiplier;
     }
 
-    private void ApplySpeedMultiplier(float multiplier)
+    private void ApplySpeedMultiplier(float value)
     {
-        rb.linearVelocity = new Vector2(0,scrollspeed * multiplier);
+        multiplier = value;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(transform.position.y<-height)
-        {
-            Vector2 resetPosition = new Vector2(0, height*1f);
-            transform.position = (Vector2)transform.position +resetPosition;
-        }
+        Vector3 position = transform.position;
+        position.y += Velocity * Time.deltaTime;
+        if (position.y < wrapBelowY) position.y += loopHeight;
+        transform.position = position;
     }
 }
